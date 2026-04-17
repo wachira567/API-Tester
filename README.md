@@ -83,6 +83,17 @@ RUNNING_IN_DOCKER=false
 API_TESTER_DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
 API_TESTER_DB_SSL=true
 API_TESTER_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+API_TESTER_MAX_SCHEMA_JSON_BYTES=262144
+API_TESTER_MAX_REQUEST_BYTES=5242880
+API_TESTER_RATE_LIMIT_ENABLED=true
+API_TESTER_RATE_LIMIT_STORAGE_URI=memory://
+API_TESTER_RATE_LIMIT_DEFAULT=300 per hour
+API_TESTER_RATE_LIMIT_IMPORT=30 per minute
+API_TESTER_RATE_LIMIT_SCHEMA_WRITE=30 per minute
+API_TESTER_RATE_LIMIT_CREDENTIAL_WRITE=30 per minute
+API_TESTER_RATE_LIMIT_ANALYZE=60 per minute
+API_TESTER_RATE_LIMIT_RUN_TEST=20 per minute
+API_TESTER_ALLOW_GUEST_USER=false
 CLERK_SECRET_KEY=your_clerk_secret_key
 ```
 
@@ -122,7 +133,16 @@ Those assets are queryable and auditable through the API.
 - `POST /api/schemas`
 - `POST /api/credential-profiles`
 - `POST /api/run-test`
-- `GET /api/analyze`
+- `GET|POST /api/analyze`
+
+## Security defaults
+
+- Collections/environments listed by the app are now user-scoped only (DB assets plus that user’s imported files).
+- Shared local folders (`collections/`, `environments/`, `postman/`) are not exposed through user list/read APIs.
+- Credential profile passwords are stored as bcrypt hashes and are never returned in API reads.
+- Request payload size is capped by `API_TESTER_MAX_REQUEST_BYTES`.
+- API routes use rate limits (configurable via `API_TESTER_RATE_LIMIT_*` envs).
+- Guest mode is disabled by default; requests must include `x-user-id` unless `API_TESTER_ALLOW_GUEST_USER=true`.
 
 ## Validation flow
 

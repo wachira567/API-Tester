@@ -29,6 +29,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import { clsx, type ClassValue } from "clsx";
@@ -1643,6 +1644,9 @@ function SetupWizard({
 }
 
 export default function App() {
+  const MOBILE_MENU_BACKDROP_Z = 2147483600;
+  const MOBILE_MENU_PANEL_Z = 2147483601;
+
   const { isLoaded, user } = useUser();
   const oauthCallbackPath = "/sso-callback";
   const [collections, setCollections] = useState<Item[]>([]);
@@ -1664,6 +1668,8 @@ export default function App() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+  const [showActiveConfigPassword, setShowActiveConfigPassword] =
+    useState(false);
   const [windowWidth, setWindowWidth] = useState(() => window.innerWidth);
   const [activePage, setActivePage] = useState<"setup" | "dashboard">("setup");
   const [flowViewMode, setFlowViewMode] = useState<"graph" | "list">("graph");
@@ -2097,8 +2103,9 @@ export default function App() {
         return localAnalysis;
       }
 
-      const response = await axios.get(`${API_BASE}/analyze`, {
-        params: {
+      const response = await axios.post(
+        `${API_BASE}/analyze`,
+        {
           filename: collection.filename,
           environmentFilename: environment?.filename,
           schemaId: selectedSchemaId || undefined,
@@ -2109,8 +2116,8 @@ export default function App() {
             password: selectedCredentialProfile?.password || "",
           },
         },
-        headers: authHeaders,
-      });
+        { headers: authHeaders },
+      );
       setAnalysis(response.data);
       return response.data as AnalysisResult;
     } catch (error) {
@@ -2549,15 +2556,24 @@ export default function App() {
     return (
       <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.16),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(99,102,241,0.18),_transparent_28%),linear-gradient(180deg,#0f172a_0%,#08101f_100%)] text-slate-100">
         <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col lg:flex-row">
-          {isMobile && isSidebarOpen && (
-            <div
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-sm lg:hidden"
-            />
-          )}
+          {isMobile &&
+            isSidebarOpen &&
+            createPortal(
+              <div
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ zIndex: MOBILE_MENU_BACKDROP_Z }}
+                className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm lg:hidden"
+              />,
+              document.body,
+            )}
 
-          {isSidebarOpen && (
-            <aside className="fixed inset-y-0 left-0 z-50 w-[88%] max-w-sm border-r border-white/10 bg-slate-950/90 px-4 py-4 shadow-[20px_0_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl lg:static lg:flex lg:w-[360px] lg:flex-col lg:px-5 lg:py-5">
+          {isSidebarOpen &&
+            (() => {
+              const setupSidebar = (
+                <aside
+                  style={{ zIndex: MOBILE_MENU_PANEL_Z }}
+                  className="fixed inset-y-0 left-0 w-[88%] max-w-sm border-r border-white/10 bg-slate-950/90 px-4 py-4 shadow-[20px_0_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl lg:static lg:flex lg:w-[360px] lg:flex-col lg:px-5 lg:py-5"
+                >
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="flex items-center gap-3">
                   <div className="rounded-2xl bg-sky-500/15 p-3 text-sky-300 ring-1 ring-inset ring-sky-500/20">
@@ -2602,8 +2618,10 @@ export default function App() {
                   </button>
                 </div>
               </div>
-            </aside>
-          )}
+                </aside>
+              );
+              return isMobile ? createPortal(setupSidebar, document.body) : setupSidebar;
+            })()}
 
           <main className="flex-1 px-4 py-4 lg:px-6 lg:py-6">
             <div className="mx-auto flex max-w-6xl flex-col gap-5">
@@ -2770,26 +2788,33 @@ export default function App() {
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.16),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(99,102,241,0.18),_transparent_28%),linear-gradient(180deg,#0f172a_0%,#08101f_100%)] text-slate-100">
       <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col lg:flex-row">
         <AnimatePresence>
-          {isMobile && isSidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-sm lg:hidden"
-            />
-          )}
+          {isMobile &&
+            isSidebarOpen &&
+            createPortal(
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{ zIndex: MOBILE_MENU_BACKDROP_Z }}
+                className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm lg:hidden"
+              />,
+              document.body,
+            )}
         </AnimatePresence>
 
         <AnimatePresence>
-          {isSidebarOpen && (
-            <motion.aside
+          {isSidebarOpen &&
+            (() => {
+              const dashboardSidebar = (
+                <motion.aside
               initial={isMobile ? { x: -320 } : { opacity: 1, x: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={isMobile ? { x: -320 } : { opacity: 1 }}
               transition={{ type: "spring", damping: 26, stiffness: 230 }}
+              style={{ zIndex: MOBILE_MENU_PANEL_Z }}
               className={cn(
-                "fixed inset-y-0 left-0 z-50 w-[88%] max-w-sm border-r border-white/10 bg-slate-950/90 px-4 py-4 shadow-[20px_0_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl lg:static lg:z-auto lg:flex lg:w-[360px] lg:flex-col lg:px-5 lg:py-5",
+                "fixed inset-y-0 left-0 w-[88%] max-w-sm border-r border-white/10 bg-slate-950/90 px-4 py-4 shadow-[20px_0_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl lg:static lg:z-auto lg:flex lg:w-[360px] lg:flex-col lg:px-5 lg:py-5",
                 isMobile ? "overflow-y-auto" : "overflow-y-auto",
               )}
             >
@@ -3067,25 +3092,40 @@ export default function App() {
                         <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
                           Password
                         </label>
-                        <input
-                          type="password"
-                          value={selectedCredentialProfile?.password || ""}
-                          onChange={(e) =>
-                            updateSelectedCredentialProfile(
-                              "password",
-                              e.target.value,
-                            )
-                          }
-                          className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                          placeholder="Test123!"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showActiveConfigPassword ? "text" : "password"}
+                            value={selectedCredentialProfile?.password || ""}
+                            onChange={(e) =>
+                              updateSelectedCredentialProfile(
+                                "password",
+                                e.target.value,
+                              )
+                            }
+                            className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 pr-16 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
+                            placeholder="Test123!"
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowActiveConfigPassword((current) => !current)
+                            }
+                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10"
+                          >
+                            {showActiveConfigPassword ? "Hide" : "Show"}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </section>
               </div>
-            </motion.aside>
-          )}
+                </motion.aside>
+              );
+              return isMobile
+                ? createPortal(dashboardSidebar, document.body)
+                : dashboardSidebar;
+            })()}
         </AnimatePresence>
 
         <main className="flex-1 overflow-y-auto px-4 pb-10 pt-4 lg:px-6 lg:py-6">

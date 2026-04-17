@@ -12,7 +12,10 @@ from typing import Any
 from dotenv import load_dotenv
 from flask import Flask, g, jsonify, request
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from jsonschema import Draft7Validator
+import bcrypt
 
 try:
     psycopg2 = importlib.import_module("psycopg2")
@@ -42,10 +45,22 @@ DATABASE_URL = os.getenv("API_TESTER_DATABASE_URL") or os.getenv("DATABASE_URL")
 DB_SSL = (os.getenv("API_TESTER_DB_SSL") or "").lower() == "true"
 HAS_DATABASE = bool(DATABASE_URL and psycopg2 is not None)
 MAX_SCHEMA_JSON_BYTES = int(os.getenv("API_TESTER_MAX_SCHEMA_JSON_BYTES", "262144"))
+MAX_REQUEST_BYTES = int(os.getenv("API_TESTER_MAX_REQUEST_BYTES", str(5 * 1024 * 1024)))
 CORS_ORIGINS_RAW = os.getenv(
     "API_TESTER_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
 )
 CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS_RAW.split(",") if origin.strip()]
+RATE_LIMIT_ENABLED = os.getenv("API_TESTER_RATE_LIMIT_ENABLED", "true").lower() != "false"
+RATE_LIMIT_STORAGE_URI = os.getenv("API_TESTER_RATE_LIMIT_STORAGE_URI", "memory://")
+RATE_LIMIT_DEFAULT = os.getenv("API_TESTER_RATE_LIMIT_DEFAULT", "300 per hour")
+RATE_LIMIT_IMPORT = os.getenv("API_TESTER_RATE_LIMIT_IMPORT", "30 per minute")
+RATE_LIMIT_SCHEMA_WRITE = os.getenv("API_TESTER_RATE_LIMIT_SCHEMA_WRITE", "30 per minute")
+RATE_LIMIT_CREDENTIAL_WRITE = os.getenv(
+    "API_TESTER_RATE_LIMIT_CREDENTIAL_WRITE", "30 per minute"
+)
+RATE_LIMIT_ANALYZE = os.getenv("API_TESTER_RATE_LIMIT_ANALYZE", "60 per minute")
+RATE_LIMIT_RUN_TEST = os.getenv("API_TESTER_RATE_LIMIT_RUN_TEST", "20 per minute")
+ALLOW_GUEST_USER = os.getenv("API_TESTER_ALLOW_GUEST_USER", "false").lower() == "true"
 
 profile_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
 schema_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
@@ -147,15 +162,7 @@ def get_sources(kind: str, user_key: str) -> list[dict[str, Any]]:
         "imported-environments" if kind == "environment" else "imported-collections"
     )
     imported_dir = get_user_import_dir(kind, user_key)
-    local_dir = ENVIRONMENT_DIR if kind == "environment" else COLLECTION_DIR
-    return [
-        {
-            "key": "environments" if kind == "environment" else "collections",
-            "dir": local_dir,
-        },
-        {"key": imported_key, "dir": imported_dir},
-        {"key": "postman", "dir": POSTMAN_DIR},
-    ]
+    return [{"key": imported_key, "dir": imported_dir}]
 
 
 def write_imported_json(
@@ -981,7 +988,7 @@ def get_credential_profiles(user_context: dict[str, Any]) -> list[dict[str, Any]
             "name": row["name"],
             "role": row.get("role") or "",
             "username": row.get("username") or "",
-            "password": row.get("password") or "",
+            "password": "",
         }
         for row in rows
     ]
@@ -991,12 +998,18 @@ def save_credential_profile(
     user_context: dict[str, Any], profile: dict[str, Any]
 ) -> dict[str, Any]:
     profile_key = str(profile.get("id") or f"cred-{int(time.time() * 1000)}")
+    password_plain = str(profile.get("password") or "")
+    password_hash = (
+        bcrypt.hashpw(password_plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        if password_plain
+        else None
+    )
     row = {
         "id": profile_key,
         "name": str(profile.get("name") or "Profile"),
         "role": str(profile.get("role") or ""),
         "username": str(profile.get("username") or ""),
-        "password": str(profile.get("password") or ""),
+        "password": password_plain,
     }
 
     if not db.conn or not user_context.get("dbUserId"):
@@ -1020,7 +1033,7 @@ def save_credential_profile(
           name = EXCLUDED.name,
           role = EXCLUDED.role,
           username = EXCLUDED.username,
-          password = EXCLUDED.password,
+          password = COALESCE(EXCLUDED.password, credential_profiles.password),
           updated_at = NOW()
         """,
         (
@@ -1029,7 +1042,7 @@ def save_credential_profile(
             row["name"],
             row["role"],
             row["username"],
-            row["password"],
+            password_hash,
         ),
     )
     return row
@@ -1230,6 +1243,21 @@ def run_newman(
 def create_app() -> Flask:
     ensure_directory(IMPORT_ROOT)
     app = Flask(__name__)
+    app.config["MAX_CONTENT_LENGTH"] = MAX_REQUEST_BYTES
+    app.config["RATELIMIT_ENABLED"] = RATE_LIMIT_ENABLED
+    app.config["RATELIMIT_STORAGE_URI"] = RATE_LIMIT_STORAGE_URI
+    app.config["RATELIMIT_HEADERS_ENABLED"] = True
+
+    def rate_limit_key() -> str:
+        user_id = request.headers.get("x-user-id")
+        return str(user_id).strip() if user_id else get_remote_address()
+
+    limiter = Limiter(
+        key_func=rate_limit_key,
+        default_limits=[RATE_LIMIT_DEFAULT],
+    )
+    limiter.init_app(app)
+
     CORS(
         app,
         resources={r"/api/*": {"origins": CORS_ORIGINS}},
@@ -1242,7 +1270,11 @@ def create_app() -> Flask:
         if request.method == "OPTIONS":
             return ("", 204)
 
-        external_id = str(request.headers.get("x-user-id", "local-guest"))
+        external_id = str(request.headers.get("x-user-id", "")).strip()
+        if not external_id and not ALLOW_GUEST_USER:
+            return jsonify({"error": "Authentication required"}), 401
+        if not external_id:
+            external_id = "local-guest"
         email = str(request.headers.get("x-user-email", ""))
         display_name = str(request.headers.get("x-user-name", ""))
         user_key = safe_user_key(external_id)
@@ -1264,6 +1296,24 @@ def create_app() -> Flask:
                 db.conn = None
 
         g.user_context = user_context
+
+    @app.after_request
+    def apply_security_headers(response: Any) -> Any:
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-site"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Cache-Control"] = "no-store"
+        if request.is_secure:
+            response.headers["Strict-Transport-Security"] = (
+                "max-age=31536000; includeSubDomains"
+            )
+        return response
+
+    @app.errorhandler(413)
+    def request_entity_too_large(_: Any) -> Any:
+        return jsonify({"error": "Request payload is too large"}), 413
 
     @app.get("/api/health")
     def health() -> Any:
@@ -1356,6 +1406,7 @@ def create_app() -> Flask:
             return jsonify({"error": f"Failed to query asset events: {error}"}), 500
 
     @app.post("/api/schemas")
+    @limiter.limit(RATE_LIMIT_SCHEMA_WRITE)
     def save_schema_endpoint() -> Any:
         payload = request.get_json(silent=True) or {}
         schema_name = str(payload.get("name", "")).strip()
@@ -1393,6 +1444,7 @@ def create_app() -> Flask:
             ), 500
 
     @app.post("/api/credential-profiles")
+    @limiter.limit(RATE_LIMIT_CREDENTIAL_WRITE)
     def save_credential_profile_endpoint() -> Any:
         payload = request.get_json(silent=True) or {}
         profile = payload.get("profile")
@@ -1408,6 +1460,7 @@ def create_app() -> Flask:
             ), 500
 
     @app.delete("/api/credential-profiles/<profile_id>")
+    @limiter.limit(RATE_LIMIT_CREDENTIAL_WRITE)
     def remove_credential_profile_endpoint(profile_id: str) -> Any:
         try:
             remove_credential_profile(g.user_context, profile_id)
@@ -1418,6 +1471,7 @@ def create_app() -> Flask:
             ), 500
 
     @app.post("/api/import")
+    @limiter.limit(RATE_LIMIT_IMPORT)
     def import_json() -> Any:
         payload = request.get_json(silent=True) or {}
         kind = payload.get("kind")
@@ -1460,7 +1514,7 @@ def create_app() -> Flask:
                 result = delete_source_file(
                     filename,
                     get_sources("collection", g.user_context["userKey"]),
-                    ["collections", "imported-collections"],
+                    ["imported-collections"],
                 )
             if not result.get("ok"):
                 return jsonify({"error": result.get("error")}), int(
@@ -1491,7 +1545,7 @@ def create_app() -> Flask:
                 result = delete_source_file(
                     filename,
                     get_sources("environment", g.user_context["userKey"]),
-                    ["environments", "imported-environments"],
+                    ["imported-environments"],
                 )
             if not result.get("ok"):
                 return jsonify({"error": result.get("error")}), int(
@@ -1509,12 +1563,15 @@ def create_app() -> Flask:
         except Exception as error:
             return jsonify({"error": f"Failed to remove environment: {error}"}), 500
 
-    @app.get("/api/analyze")
+    @app.route("/api/analyze", methods=["GET", "POST"])
+    @limiter.limit(RATE_LIMIT_ANALYZE)
     def analyze() -> Any:
-        filename = request.args.get("filename")
-        environment_filename = request.args.get("environmentFilename")
-        schema_id = request.args.get("schemaId")
-        schema_content = request.args.get("schemaContent")
+        payload = request.get_json(silent=True) or {}
+        source = payload if request.method == "POST" else request.args
+        filename = source.get("filename")
+        environment_filename = source.get("environmentFilename")
+        schema_id = source.get("schemaId")
+        schema_content = source.get("schemaContent")
 
         if not filename:
             return jsonify({"error": "filename is required"}), 400
@@ -1551,9 +1608,7 @@ def create_app() -> Flask:
             if not collection:
                 return jsonify({"error": "Collection not found"}), 404
 
-            variable_overrides = parse_variable_overrides(
-                request.args.get("variableOverrides")
-            )
+            variable_overrides = parse_variable_overrides(source.get("variableOverrides"))
             schema_doc = resolve_schema_selection(
                 g.user_context, schema_id, schema_content
             )
@@ -1565,6 +1620,7 @@ def create_app() -> Flask:
             return jsonify({"error": f"Invalid JSON file: {error}"}), 400
 
     @app.post("/api/run-test")
+    @limiter.limit(RATE_LIMIT_RUN_TEST)
     def run_test() -> Any:
         payload = request.get_json(silent=True) or {}
         filename = payload.get("filename")
