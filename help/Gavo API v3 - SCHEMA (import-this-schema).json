@@ -1,0 +1,3754 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "default": {
+    "type": "object",
+    "additionalProperties": true
+  },
+  "requests": {
+    "POST::00-Initial Login": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Login": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Me": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Register": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::List": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Get": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "PUT::Update": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "DELETE::Delete": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "PUT::Change Pass": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Req Reset": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Ver Reset": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Reset Password": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Notif Get": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "PUT::Notif Set": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Generate OTP": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Verify OTP": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Resend OTP": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Create": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Trans": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Init": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Verify": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Resend": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Status": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Pending": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Approve": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Reject": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Create Discount": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::List Discounts": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Calculate Price": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::List Public": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Assign": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "DELETE::Unassign": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Channels": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::MC Get": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "PUT::MC Set": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Withdraw": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Balance": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Ledger": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::TopUps": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::MPesa TopUp": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Bank TopUp": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::List Available Fulfillment Services": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get Service Fulfillment Services": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Add Fulfillment Service": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "PUT::Update Fulfillment Service": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "DELETE::Remove Fulfillment Service": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::By Phone": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::By Org": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::By Service": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Set PIN": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Validate PIN": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "PUT::Change PIN": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Profile": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Transactions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Rewards": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Request Password Reset": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Confirm Password Reset": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Change Password": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "PATCH::Update Status": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Get Channel By ID": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::List Service Channels": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Create Channel": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get By Code": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get By Country": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Format Amount": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Create Currency": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::List Rewards": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get Service Reward Config": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Redeem Reward": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Debit Reward": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Consumed Callback": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Initiate Withdrawal": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Pending Renewals": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get Withdrawal Details": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Approve Withdrawal": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Reject Withdrawal": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Stats": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Export": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Apply": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::By Ref": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Organization Analytics": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Service Analytics": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Service Summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Transaction Analytics": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::System Summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Dashboard Profile": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::By Code": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Single Dispatch": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        201,
+        400,
+        404
+      ]
+    },
+    "POST::Bulk Upload": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        201,
+        400,
+        404
+      ]
+    },
+    "GET::List Trans": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Export Trans": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Export Customer": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Create Batch": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        201,
+        400,
+        404
+      ]
+    },
+    "GET::List Batches": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Export Batch Sum": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Get Batch": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Batch Trans": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Preview": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "POST::Execute": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "POST::Cancel": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Export Batch": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Create Sched": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        201,
+        400,
+        404
+      ]
+    },
+    "GET::List Sched": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Get Sched": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Sched Preview": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Approve Sched": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "POST::Reject Sched": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "POST::Cancel Sched": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "GET::Sched Execs": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Execute Now": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "PUT::Update Sched": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Disp Analytics Sys": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Disp Analytics Svc": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Batch Perf": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Product Perf": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Disp Dashboard": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Disp Export": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Recon List": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "GET::Recon Stats": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Bulk Recon": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Check Timeouts": {
+      "type": "object",
+      "required": [
+        "success"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "data": {
+          "type": [
+            "object",
+            "array",
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true,
+      "xExpectedStatusCodes": [
+        200
+      ]
+    },
+    "POST::Reconcile": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            },
+            "message": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "data": {
+              "type": [
+                "object",
+                "array",
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "error": {
+              "type": [
+                "string",
+                "object",
+                "array",
+                "null"
+              ]
+            },
+            "errors": {
+              "type": [
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            "statusCode": {
+              "type": [
+                "integer",
+                "string",
+                "null"
+              ]
+            },
+            "success": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      ],
+      "xExpectedStatusCodes": [
+        200,
+        400,
+        404
+      ]
+    },
+    "POST::STK Push": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::STK Push Status": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::M-Pesa Callback": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::List Admin Channels": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Create Admin Channel": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Admin List All": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get Organization Discounts": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get Discount Details": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "PUT::Update Discount": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "DELETE::Delete Discount": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Restore Discount": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Lookup Customer": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Register Customer": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Send OTP": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Reward Balance": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Change PIN": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Get Profile": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "PATCH::Update Profile": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Service Config": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Redemption Methods": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Transactions History": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::Initiate STK Push": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Logs": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Overview": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "GET::Products": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::C2B Validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    },
+    "POST::C2B Notification": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "No explicit example response code found in collection."
+    }
+  }
+}

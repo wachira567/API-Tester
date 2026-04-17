@@ -1201,6 +1201,12 @@ function SetupWizard({
   onPasswordChange,
   onImportCollectionFile,
   onImportEnvironmentFile,
+  selectedCollectionContent,
+  selectedEnvironmentContent,
+  onCollectionContentChange,
+  onEnvironmentContentChange,
+  onApplyCollectionEdits,
+  onApplyEnvironmentEdits,
   onRunCollection,
   onOpenDashboard,
 }: {
@@ -1222,6 +1228,12 @@ function SetupWizard({
   onPasswordChange: (value: string) => void;
   onImportCollectionFile: (file: File) => Promise<void>;
   onImportEnvironmentFile: (file: File) => Promise<void>;
+  selectedCollectionContent: string;
+  selectedEnvironmentContent: string;
+  onCollectionContentChange: (value: string) => void;
+  onEnvironmentContentChange: (value: string) => void;
+  onApplyCollectionEdits: () => void;
+  onApplyEnvironmentEdits: () => void;
   onRunCollection: () => Promise<void>;
   onOpenDashboard: () => void;
 }) {
@@ -1358,6 +1370,18 @@ function SetupWizard({
           >
             Import pasted collection
           </button>
+          <textarea
+            value={selectedCollectionContent}
+            onChange={(event) => onCollectionContentChange(event.target.value)}
+            placeholder='Edit selected collection JSON here, then click "Apply collection edits".'
+            className="min-h-[180px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
+          />
+          <button
+            onClick={onApplyCollectionEdits}
+            className="inline-flex items-center gap-2 rounded-2xl border border-sky-500/25 bg-sky-500/10 px-4 py-3 text-sm font-bold text-sky-100 transition hover:bg-sky-500/20"
+          >
+            Apply collection edits
+          </button>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="space-y-2 text-sm text-slate-300">
@@ -1453,6 +1477,18 @@ function SetupWizard({
             disabled={!environmentDraft.trim()}
           >
             Import pasted environment
+          </button>
+          <textarea
+            value={selectedEnvironmentContent}
+            onChange={(event) => onEnvironmentContentChange(event.target.value)}
+            placeholder='Edit selected environment JSON here, then click "Apply environment edits".'
+            className="min-h-[180px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
+          />
+          <button
+            onClick={onApplyEnvironmentEdits}
+            className="inline-flex items-center gap-2 rounded-2xl border border-violet-500/25 bg-violet-500/10 px-4 py-3 text-sm font-bold text-violet-100 transition hover:bg-violet-500/20"
+          >
+            Apply environment edits
           </button>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
@@ -2318,7 +2354,6 @@ export default function App() {
             : null);
         if (importedItem) {
           setSelectedCollection(importedItem);
-          setActivePage("dashboard");
           await refreshAnalysis(importedItem, selectedEnv);
         }
       } else {
@@ -2372,7 +2407,6 @@ export default function App() {
           [importedItem.filename]: JSON.stringify(parsed, null, 2),
         }));
         setSelectedCollection(importedItem);
-        setActivePage("dashboard");
         await refreshAnalysis(importedItem, selectedEnv);
       } else {
         setEnvironments((current) => {
@@ -2484,6 +2518,87 @@ export default function App() {
     setExpandedId(null);
     setActivePage("dashboard");
     if (isMobile) setMobileMenuOpen(false);
+  };
+
+  const updateSelectedCollectionContent = (value: string) => {
+    if (!selectedCollection) return;
+    setCollectionContentByFilename((current) => ({
+      ...current,
+      [selectedCollection.filename]: value,
+    }));
+  };
+
+  const updateSelectedEnvironmentContent = (value: string) => {
+    if (!selectedEnv) return;
+    setEnvironmentContentByFilename((current) => ({
+      ...current,
+      [selectedEnv.filename]: value,
+    }));
+  };
+
+  const applySelectedCollectionEdits = () => {
+    if (!selectedCollection) return;
+    const raw = collectionContentByFilename[selectedCollection.filename];
+    if (!raw || !raw.trim()) return;
+    try {
+      const parsed = JSON.parse(raw);
+      setCollectionContentByFilename((current) => ({
+        ...current,
+        [selectedCollection.filename]: JSON.stringify(parsed, null, 2),
+      }));
+      void refreshAnalysis(selectedCollection, selectedEnv);
+      pushNotification({
+        kind: "success",
+        title: "Collection edits applied",
+        detail: "Collection JSON was validated and updated for this selected item.",
+        resolution:
+          "You can continue editing in setup or run the collection when ready.",
+      });
+    } catch (error) {
+      pushNotification({
+        kind: "error",
+        title: "Invalid collection JSON",
+        detail:
+          error instanceof Error
+            ? error.message
+            : "Collection JSON could not be parsed.",
+        resolution:
+          "Fix JSON syntax in the editor, then click Apply collection edits again.",
+      });
+    }
+  };
+
+  const applySelectedEnvironmentEdits = () => {
+    if (!selectedEnv) return;
+    const raw = environmentContentByFilename[selectedEnv.filename];
+    if (!raw || !raw.trim()) return;
+    try {
+      const parsed = JSON.parse(raw);
+      setEnvironmentContentByFilename((current) => ({
+        ...current,
+        [selectedEnv.filename]: JSON.stringify(parsed, null, 2),
+      }));
+      void refreshAnalysis(selectedCollection, selectedEnv);
+      pushNotification({
+        kind: "success",
+        title: "Environment edits applied",
+        detail:
+          "Environment JSON was validated and updated for this selected item.",
+        resolution:
+          "You can keep editing in setup or run once the variables look correct.",
+      });
+    } catch (error) {
+      pushNotification({
+        kind: "error",
+        title: "Invalid environment JSON",
+        detail:
+          error instanceof Error
+            ? error.message
+            : "Environment JSON could not be parsed.",
+        resolution:
+          "Fix JSON syntax in the editor, then click Apply environment edits again.",
+      });
+    }
   };
 
   const resetHome = () => {
@@ -2662,10 +2777,12 @@ export default function App() {
                   setSelectedCollection(item);
                   setResults(null);
                   setExpandedId(null);
+                  setActivePage("setup");
                   void refreshAnalysis(item, selectedEnv);
                 }}
                 onSelectEnv={(item) => {
                   setSelectedEnv(item);
+                  setActivePage("setup");
                   void refreshAnalysis(selectedCollection, item);
                 }}
                 onBaseUrlChange={setBaseUrl}
@@ -2684,6 +2801,20 @@ export default function App() {
                 onImportEnvironmentFile={(file) =>
                   importJsonFile("environment", file)
                 }
+                selectedCollectionContent={
+                  selectedCollection
+                    ? collectionContentByFilename[selectedCollection.filename] || ""
+                    : ""
+                }
+                selectedEnvironmentContent={
+                  selectedEnv
+                    ? environmentContentByFilename[selectedEnv.filename] || ""
+                    : ""
+                }
+                onCollectionContentChange={updateSelectedCollectionContent}
+                onEnvironmentContentChange={updateSelectedEnvironmentContent}
+                onApplyCollectionEdits={applySelectedCollectionEdits}
+                onApplyEnvironmentEdits={applySelectedEnvironmentEdits}
                 onRunCollection={runTest}
                 onOpenDashboard={() => setActivePage("dashboard")}
               />
