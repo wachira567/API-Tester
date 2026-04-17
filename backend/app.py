@@ -41,6 +41,11 @@ DB_ENVIRONMENT_PREFIX = "db-environments"
 DATABASE_URL = os.getenv("API_TESTER_DATABASE_URL") or os.getenv("DATABASE_URL") or ""
 DB_SSL = (os.getenv("API_TESTER_DB_SSL") or "").lower() == "true"
 HAS_DATABASE = bool(DATABASE_URL and psycopg2 is not None)
+MAX_SCHEMA_JSON_BYTES = int(os.getenv("API_TESTER_MAX_SCHEMA_JSON_BYTES", "262144"))
+CORS_ORIGINS_RAW = os.getenv(
+    "API_TESTER_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+)
+CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS_RAW.split(",") if origin.strip()]
 
 profile_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
 schema_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
@@ -605,6 +610,33 @@ def validate_response_with_schema(
     if errors:
         return {"configured": True, "passed": False, "error": "; ".join(errors)}
     return {"configured": True, "passed": True, "error": None}
+
+
+def parse_schema_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    schema_object = payload.get("schema")
+
+    if schema_object is None and payload.get("schemaContent") is not None:
+        schema_content = payload.get("schemaContent")
+        if not isinstance(schema_content, str) or not schema_content.strip():
+            raise ValueError("schemaContent must be a non-empty JSON string")
+        try:
+            schema_object = json.loads(schema_content)
+        except json.JSONDecodeError as error:
+            raise ValueError("schemaContent must be valid JSON") from error
+
+    if not isinstance(schema_object, dict):
+        raise ValueError("Schema must be a JSON object")
+
+    encoded = json.dumps(schema_object, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
+    if len(encoded) > MAX_SCHEMA_JSON_BYTES:
+        limit_kb = MAX_SCHEMA_JSON_BYTES // 1024
+        raise ValueError(
+            f"Schema JSON exceeds the {limit_kb}KB size limit. Upload a smaller schema file."
+        )
+
+    return schema_object
 
 
 def analyze_collection_document(
@@ -1198,10 +1230,18 @@ def run_newman(
 def create_app() -> Flask:
     ensure_directory(IMPORT_ROOT)
     app = Flask(__name__)
-    CORS(app)
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": CORS_ORIGINS}},
+        allow_headers=["Content-Type", "Authorization", "x-user-id", "x-user-email", "x-user-name"],
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    )
 
     @app.before_request
-    def attach_user_context() -> None:
+    def attach_user_context() -> Any:
+        if request.method == "OPTIONS":
+            return ("", 204)
+
         external_id = str(request.headers.get("x-user-id", "local-guest"))
         email = str(request.headers.get("x-user-email", ""))
         display_name = str(request.headers.get("x-user-name", ""))
@@ -1216,8 +1256,12 @@ def create_app() -> Flask:
         }
 
         if db.conn:
-            db_user = ensure_db_user(external_id, email, display_name)
-            user_context["dbUserId"] = db_user.get("id") if db_user else None
+            try:
+                db_user = ensure_db_user(external_id, email, display_name)
+                user_context["dbUserId"] = db_user.get("id") if db_user else None
+            except Exception:
+                # Fail open to local-storage mode when DB auth/user upsert is unavailable.
+                db.conn = None
 
         g.user_context = user_context
 
@@ -1319,11 +1363,7 @@ def create_app() -> Flask:
             return jsonify({"error": "name is required"}), 400
 
         try:
-            schema_object = payload.get("schema")
-            if not schema_object and payload.get("schemaContent"):
-                schema_object = json.loads(payload.get("schemaContent"))
-            if not isinstance(schema_object, dict):
-                return jsonify({"error": "schema or schemaContent is required"}), 400
+            schema_object = parse_schema_payload(payload)
 
             saved = save_user_schema(g.user_context, schema_name, schema_object)
             schemas_out = get_user_schemas(g.user_context)
@@ -1833,11 +1873,15 @@ def create_app() -> Flask:
 
 app = create_app()
 
-
-if __name__ == "__main__":
-    if HAS_DATABASE:
+if HAS_DATABASE:
+    try:
         db.connect()
         initialize_database()
+    except Exception:
+        db.conn = None
+
+
+if __name__ == "__main__":
     print(f"Server running on port {PORT}")
     if HAS_DATABASE:
         print(

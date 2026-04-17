@@ -33,7 +33,14 @@ import axios from "axios";
 import { jsPDF } from "jspdf";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { UserButton, useSignIn, useSignUp, useUser } from "@clerk/react";
+import {
+  AuthenticateWithRedirectCallback,
+  UserButton,
+  useClerk,
+  useSignIn,
+  useSignUp,
+  useUser,
+} from "@clerk/react";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -89,6 +96,7 @@ function AuthLanding() {
   const [authMessage, setAuthMessage] = useState<string | null>(null);
 
   const { isLoaded: userLoaded } = useUser();
+  const clerk = useClerk();
   const { signIn, fetchStatus: signInFetchStatus } = useSignIn();
   const { signUp, fetchStatus: signUpFetchStatus } = useSignUp();
   const clerkBusy =
@@ -269,21 +277,14 @@ function AuthLanding() {
     setIsSubmitting(true);
     setAuthError(null);
     setAuthMessage(null);
-    const redirectTo = window.location.origin;
+    const origin = window.location.origin;
 
     try {
-      const result = await signIn.sso({
+      await clerk.client?.signIn.authenticateWithRedirect({
         strategy,
-        redirectUrl: redirectTo,
-        redirectCallbackUrl: redirectTo,
+        redirectUrl: `${origin}/sso-callback`,
+        redirectUrlComplete: origin,
       });
-
-      if (result.error) {
-        setAuthError(
-          clerkErrorMessage(result.error, "Could not start social sign in."),
-        );
-        return;
-      }
     } catch (error) {
       setAuthError(clerkErrorMessage(error, "Could not start social sign in."));
     } finally {
@@ -608,7 +609,8 @@ interface TestResults {
   executions: Execution[];
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001/api";
+const API_BASE = import.meta.env.VITE_API_BASE || "/api";
+const MAX_SCHEMA_JSON_BYTES = 262144;
 
 function formatPayloadForDisplay(payload: string | null): string {
   if (!payload) return "";
@@ -1642,6 +1644,7 @@ function SetupWizard({
 
 export default function App() {
   const { isLoaded, user } = useUser();
+  const oauthCallbackPath = "/sso-callback";
   const [collections, setCollections] = useState<Item[]>([]);
   const [environments, setEnvironments] = useState<Item[]>([]);
   const [schemas, setSchemas] = useState<SchemaItem[]>([]);
@@ -1961,6 +1964,17 @@ export default function App() {
   const saveSchemaDraft = async () => {
     try {
       const parsedSchema = JSON.parse(schemaContentDraft);
+      if (typeof parsedSchema !== "object" || parsedSchema === null) {
+        pushNotification({
+          kind: "warning",
+          title: "Schema must be a JSON object",
+          detail:
+            "Only JSON object schemas are supported for validation and storage.",
+          resolution:
+            "Upload or paste a valid JSON object schema (not an array, number, or string).",
+        });
+        return;
+      }
       const response = await axios.post(
         `${API_BASE}/schemas`,
         {
@@ -1989,6 +2003,69 @@ export default function App() {
     } catch (error) {
       pushNotification(buildTroubleshootingNotification(error, "Schema save"));
     }
+  };
+
+  const importSchemaFile = async (file: File) => {
+    const isJsonByName = file.name.toLowerCase().endsWith(".json");
+    const isJsonByMime =
+      file.type === "application/json" || file.type === "text/json";
+
+    if (!isJsonByName && !isJsonByMime) {
+      pushNotification({
+        kind: "warning",
+        title: "Only JSON schema files are allowed",
+        detail: "This upload accepts only .json files for schema validation.",
+        resolution: "Rename/export the file as .json and try again.",
+      });
+      return;
+    }
+
+    const content = await file.text();
+    const byteLength = new TextEncoder().encode(content).length;
+    if (byteLength > MAX_SCHEMA_JSON_BYTES) {
+      pushNotification({
+        kind: "warning",
+        title: "Schema file is too large",
+        detail: "The schema exceeds the 256KB upload limit.",
+        resolution:
+          "Reduce schema size (remove unrelated examples/metadata) and re-upload.",
+      });
+      return;
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      pushNotification({
+        kind: "error",
+        title: "Invalid JSON file",
+        detail: "The uploaded file is not valid JSON.",
+        resolution: "Fix JSON syntax and upload a valid .json schema file.",
+      });
+      return;
+    }
+
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      pushNotification({
+        kind: "warning",
+        title: "Schema must be a JSON object",
+        detail:
+          "Validation schema uploads must contain a top-level JSON object.",
+        resolution: "Use an object-based schema file and upload again.",
+      });
+      return;
+    }
+
+    const schemaNameFromFile = file.name.replace(/\.json$/i, "").trim();
+    setSchemaNameDraft(schemaNameFromFile || schemaNameDraft);
+    setSchemaContentDraft(JSON.stringify(parsed, null, 2));
+    pushNotification({
+      kind: "success",
+      title: "Schema file loaded",
+      detail: "JSON schema content has been loaded into the editor.",
+      resolution: "Review it, then click Save schema.",
+    });
   };
 
   const refreshAnalysis = async (
@@ -2453,6 +2530,17 @@ export default function App() {
     );
   }
 
+  if (window.location.pathname === oauthCallbackPath) {
+    return (
+      <AuthenticateWithRedirectCallback
+        signInFallbackRedirectUrl="/"
+        signUpFallbackRedirectUrl="/"
+        signInForceRedirectUrl="/"
+        signUpForceRedirectUrl="/"
+      />
+    );
+  }
+
   if (!user) {
     return <AuthLanding />;
   }
@@ -2635,6 +2723,24 @@ export default function App() {
                   className="mt-4 min-h-[220px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
                   placeholder='{"default":{"type":"object"},"requests":{"GET::Health":{"type":"object"}}}'
                 />
+
+                <label className="mt-4 block rounded-[1.5rem] border border-dashed border-white/15 bg-black/20 p-4 text-sm text-slate-300">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
+                    Upload schema JSON
+                  </span>
+                  <input
+                    type="file"
+                    accept="application/json,.json"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) {
+                        void importSchemaFile(file);
+                      }
+                      event.currentTarget.value = "";
+                    }}
+                    className="block w-full text-sm text-slate-300 file:mr-4 file:rounded-2xl file:border-0 file:bg-violet-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-violet-400"
+                  />
+                </label>
 
                 <div className="mt-4 flex flex-wrap gap-3">
                   <button

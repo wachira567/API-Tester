@@ -63,7 +63,9 @@ http://127.0.0.1:5173
 Create or update `api-tester-dashboard/frontend/.env`:
 
 ```env
-VITE_API_BASE=http://127.0.0.1:3101/api
+VITE_API_BASE=/api
+# Optional (Vite dev proxy target)
+# VITE_API_PROXY_TARGET=http://127.0.0.1:3101
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 ```
 
@@ -80,6 +82,7 @@ RUNNING_IN_DOCKER=false
 
 API_TESTER_DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
 API_TESTER_DB_SSL=true
+API_TESTER_CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 CLERK_SECRET_KEY=your_clerk_secret_key
 ```
 
