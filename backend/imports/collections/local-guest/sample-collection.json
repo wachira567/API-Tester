@@ -1,0 +1,21 @@
+{
+  "info": {
+    "name": "test"
+  },
+  "item": [
+    {
+      "name": "Ping",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/health"
+        }
+      },
+      "response": [
+        {
+          "code": 200
+        }
+      ]
+    }
+  ]
+}

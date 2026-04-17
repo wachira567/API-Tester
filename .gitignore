@@ -1,0 +1,33 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Node / frontend
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/.vite/
+
+# Python / backend
+**/__pycache__/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.venv/
+**/venv/
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+
+# Test / coverage artifacts
+coverage/
+htmlcov/
+.coverage
+newman/

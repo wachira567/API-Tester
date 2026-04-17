@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3111:3001"
+    volumes:
+      - ./collections:/app/collections
+      - ./environments:/app/environments
+      - ../postman:/app/postman:ro
+    environment:
+      - PORT=3001
+      - COLLECTION_PATH=/app/collections
+      - ENVIRONMENT_PATH=/app/environments
+      - POSTMAN_PATH=/app/postman
+      - RUNNING_IN_DOCKER=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gavo-network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./frontend/.env
+    environment:
+      - VITE_API_BASE=http://backend:3001/api
+    depends_on:
+      - backend
+    networks:
+      - gavo-network
+
+networks:
+  gavo-network:
+    driver: bridge

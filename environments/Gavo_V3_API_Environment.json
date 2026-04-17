@@ -1,0 +1,171 @@
+{
+  "id": "gavo-v3-env",
+  "name": "Gavo V3 Environment - Local",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "https://gavo.tinka.co.ke/api/dev",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "username",
+      "value": "admin",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "password",
+      "value": "Test123!",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "auth_token",
+      "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX3JvbGVzIjpbIm9yZ2FuaXphdGlvbl9hZG1pbiIsInN5c3RlbV9hZG1pbiJdLCJ1c2VyX2lkIjoiNzgwMzgyNDMtZDJlZC00YzZjLWEwZWUtYTJkY2YwMDIyMTgzIiwib3JnYW5pemF0aW9uX2lkIjoiMWU2ZTQ2YTQtY2M0Zi00YWU1LWI4YWEtNDJjMTEzNTc0MjA3IiwiZXhwIjoxNzc1OTA3Mzc0fQ._rcsTYO9OgDNE6l2jEqITHZ7Zh3Y94rZ9xBSAqT78Rk",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "user_id",
+      "value": "78038243-d2ed-4c6c-a0ee-a2dcf0022183",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "organization_id",
+      "value": "1e6e46a4-cc4f-4ae5-b8aa-42c113574207",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "organization_id_new",
+      "value": "07f01a00-ff2a-4911-a00e-dd72ea04e980",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_id",
+      "value": "fe629988-871d-463b-8878-977cef99c450",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_id",
+      "value": "8e746c3b-37a7-4125-a8c3-e84bfb2aade2",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "fulfillment_product_id",
+      "value": "0990211c-8404-49dd-959e-52b89629c6bb",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "dispatch_batch_id",
+      "value": "b157fb74-34ed-4a4b-b763-356d0d0b8e73",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_code",
+      "value": "TINKA-AIRTIME",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "channel_id",
+      "value": "e246b61d-9a91-4ad0-a164-3f5d593b041f",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "channel_code",
+      "value": "airtime",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_phone",
+      "value": "254776433325",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "organization_name",
+      "value": "Tinka Networks Limited",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contact_email",
+      "value": "admin@tinka.co.ke",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contact_phone",
+      "value": "254724747747",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_name",
+      "value": "Tinka WhatsApp Airtime Service",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_first_name",
+      "value": "Test",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_last_name",
+      "value": "Customer",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "currency_code",
+      "value": "KES",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_phone",
+      "value": "254789033249",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "phone_number",
+      "value": "254776433325",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_amount",
+      "value": "10",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_user_name",
+      "value": "Test User",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "email",
+      "value": "test@tinka.co.ke",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-04-10T16:00:00.000Z",
+  "_comment": "Environment for Gavo V3 API testing - local with real data"
+}
