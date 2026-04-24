@@ -268,14 +268,7 @@ def delete_source_file(
 
 
 def normalize_base_url_for_runtime(base_url: str) -> str:
-    trimmed = (base_url or "").strip()
-    if not trimmed:
-        return trimmed
-    if os.getenv("RUNNING_IN_DOCKER") == "true":
-        return trimmed.replace("://localhost", "://host.docker.internal").replace(
-            "://127.0.0.1", "://host.docker.internal"
-        )
-    return trimmed
+    return (base_url or "").strip()
 
 
 def apply_variable_overrides(

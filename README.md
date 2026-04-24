@@ -31,14 +31,6 @@ Default backend URL:
 http://127.0.0.1:3101/api
 ```
 
-If you want to override the port or paths, set these environment variables first:
-
-```bash
-PORT=3101 \
-COLLECTION_PATH=../collections \
-ENVIRONMENT_PATH=../environments \
-POSTMAN_PATH=../../postman \
-RUNNING_IN_DOCKER=false \
 python app.py
 ```
 
@@ -78,7 +70,7 @@ PORT=3101
 COLLECTION_PATH=../collections
 ENVIRONMENT_PATH=../environments
 POSTMAN_PATH=../../postman
-RUNNING_IN_DOCKER=false
+POSTMAN_PATH=../../postman
 
 API_TESTER_DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
 API_TESTER_DB_SSL=true
@@ -186,29 +178,7 @@ source .venv/bin/activate
 pytest -q
 ```
 
-## Docker
 
-If you prefer Docker, use the compose file inside `api-tester-dashboard/`.
-
-```bash
-cd api-tester-dashboard
-docker-compose up --build
-```
-
-Docker publishes the backend on host port `3111` and the frontend on `5173`. The frontend container talks to the backend over the Docker network using `http://backend:3001/api`.
-The frontend service reads `frontend/.env` through compose so `VITE_CLERK_PUBLISHABLE_KEY` is available at runtime even though the Docker build context ignores local `.env` files.
-
-If your Docker installation only supports the newer `docker compose` syntax, you can use that instead. In this workspace, the configured compose command is `docker-compose`.
-
-If you see `KeyError: 'ContainerConfig'` during `docker-compose up --build`, run:
-
-```bash
-docker-compose down --remove-orphans
-docker-compose rm -sf
-docker-compose up --build
-```
-
-This workspace uses the legacy `docker-compose` CLI, and recreating old containers can trigger that error until the stale containers are removed.
 
 ## Notes
 
@@ -216,4 +186,3 @@ This workspace uses the legacy `docker-compose` CLI, and recreating old containe
 - Frontend runs on port `5173` by default.
 - `VITE_CLERK_PUBLISHABLE_KEY` must be set for the frontend to initialize Clerk.
 - The backend uses the Clerk identity headers only for account scoping; the app still owns the main workflow logic.
-- On Linux, if you run the backend inside Docker and need to reach a host service, `localhost` may need to be translated to `host.docker.internal`.
