@@ -1,4 +1,4 @@
-# API Tester Dashboard
+# Nexus API Explorer
 
 A local-first API testing workspace for loading Postman collections, validating environment variables, attaching JSON validation schemas, and running Newman-backed test executions with clear pass/fail diagnostics.
 

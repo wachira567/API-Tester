@@ -1,66 +1,40 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import {
-  ArrowRight,
   Activity,
-  AlertCircle,
   CheckCircle2,
-  ChevronDown,
-  ChevronRight,
-  ClipboardList,
   Database,
-  FileJson,
-  Home,
-  Layers,
   Loader2,
-  Menu,
   Play,
-  Download,
-  Link2,
-  List,
-  Sparkles,
-  Settings,
-  ShieldCheck,
-  Grid3X3,
-  Trash2,
-  Workflow,
-  Upload,
-  TriangleAlert,
-  X,
   XCircle,
+  GripVertical,
+  Plus,
+  Clock,
+  X,
+  Zap,
+  Copy,
+  Terminal,
+  Globe,
+  Trash2,
+  ChevronRight,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { createPortal } from "react-dom";
 import axios from "axios";
-import { jsPDF } from "jspdf";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
   AuthenticateWithRedirectCallback,
-  UserButton,
   useClerk,
   useSignIn,
   useSignUp,
   useUser,
 } from "@clerk/react";
+import Sidebar from "./components/Sidebar";
+import { ProjectGrid } from "./components/ProjectGrid";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function Show({
-  when,
-  children,
-}: {
-  when: "signed-in" | "signed-out";
-  children: React.ReactNode;
-}) {
-  const { user } = useUser();
-  const signedIn = Boolean(user);
-  if (when === "signed-in") {
-    return signedIn ? <>{children}</> : null;
-  }
-  return signedIn ? null : <>{children}</>;
-}
 
 function clerkErrorMessage(error: unknown, fallback: string) {
   if (
@@ -297,11 +271,11 @@ function AuthLanding() {
   return (
     <div className="flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_10%,rgba(14,165,233,0.2),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(34,197,94,0.14),transparent_32%),linear-gradient(165deg,#040711_0%,#071330_58%,#020617_100%)] px-4 py-10 text-slate-100">
       <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.04)_1px,transparent_1px)] bg-[size:32px_32px]" />
-      <div className="relative w-full max-w-5xl overflow-hidden rounded-[2.4rem] border border-sky-200/10 bg-slate-950/55 backdrop-blur-2xl">
+      <div className="relative w-full max-w-5xl overflow-hidden rounded-[2.4rem] border border-indigo-200/10 bg-slate-950/55 backdrop-blur-2xl">
         <div className="grid md:grid-cols-[1.15fr_1fr]">
           <section className="relative border-b border-white/10 p-8 md:border-b-0 md:border-r md:p-10">
-            <span className="inline-flex items-center gap-2 rounded-full border border-sky-300/30 bg-sky-400/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-200">
-              Gavo API Tester
+            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-300/30 bg-indigo-400/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-indigo-200">
+              Nexus API Explorer
             </span>
             <h1 className="mt-6 text-4xl font-black leading-tight text-white md:text-5xl">
               Validate APIs with confidence.
@@ -336,7 +310,7 @@ function AuthLanding() {
                 className={cn(
                   "rounded-xl px-4 py-2 text-sm font-semibold transition",
                   mode === "signin"
-                    ? "bg-sky-400 text-slate-950"
+                    ? "bg-indigo-400 text-slate-950"
                     : "text-slate-300 hover:text-white",
                 )}
               >
@@ -360,7 +334,7 @@ function AuthLanding() {
 
             <div className="space-y-4">
               {clerkBusy && (
-                <div className="rounded-2xl border border-sky-300/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-100">
+                <div className="rounded-2xl border border-indigo-300/30 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100">
                   Preparing secure authentication...
                 </div>
               )}
@@ -371,7 +345,7 @@ function AuthLanding() {
                   type="email"
                   value={identifier}
                   onChange={(event) => setIdentifier(event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-sky-400/50"
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-indigo-400/50"
                   placeholder="you@example.com"
                 />
               </label>
@@ -382,7 +356,7 @@ function AuthLanding() {
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-sky-400/50"
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-indigo-400/50"
                   placeholder="At least 8 characters"
                 />
               </label>
@@ -447,7 +421,7 @@ function AuthLanding() {
                 className={cn(
                   "mt-2 w-full rounded-2xl px-5 py-3 text-sm font-bold text-slate-950 transition",
                   mode === "signin"
-                    ? "bg-sky-300 hover:bg-sky-200"
+                    ? "bg-indigo-300 hover:bg-indigo-200"
                     : "bg-emerald-300 hover:bg-emerald-200",
                   "disabled:cursor-not-allowed disabled:opacity-60",
                 )}
@@ -495,6 +469,9 @@ function AuthLanding() {
 interface Item {
   name: string;
   filename: string;
+  source: string;
+  updatedAt?: string;
+  parent_collection_key?: string;
 }
 
 interface Assertion {
@@ -564,6 +541,7 @@ interface SchemaItem {
 interface AnalysisResult {
   summary: AnalysisSummary;
   issues: AnalysisIssue[];
+  nexusMetadata?: Record<string, any>;
 }
 
 interface Stats {
@@ -611,21 +589,13 @@ interface TestResults {
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE || "/api";
-const MAX_SCHEMA_JSON_BYTES = 262144;
 
-function formatPayloadForDisplay(payload: string | null): string {
-  if (!payload) return "";
-  try {
-    return JSON.stringify(JSON.parse(payload), null, 2);
-  } catch {
-    return payload;
-  }
-}
+
 
 function methodTone(method: string) {
   switch (method) {
     case "GET":
-      return "bg-sky-500/15 text-sky-300 border-sky-500/20";
+      return "bg-indigo-500/15 text-indigo-300 border-indigo-500/20";
     case "POST":
       return "bg-emerald-500/15 text-emerald-300 border-emerald-500/20";
     case "PUT":
@@ -639,24 +609,6 @@ function methodTone(method: string) {
   }
 }
 
-function statusTone(passed: boolean) {
-  return passed
-    ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/20"
-    : "bg-rose-500/15 text-rose-300 border-rose-500/20";
-}
-
-function notificationTone(kind: NotificationKind) {
-  switch (kind) {
-    case "success":
-      return "border-emerald-500/20 bg-emerald-500/10 text-emerald-100";
-    case "warning":
-      return "border-amber-500/20 bg-amber-500/10 text-amber-100";
-    case "error":
-      return "border-rose-500/20 bg-rose-500/10 text-rose-100";
-    default:
-      return "border-sky-500/20 bg-sky-500/10 text-sky-100";
-  }
-}
 
 function buildTroubleshootingNotification(
   error: unknown,
@@ -897,25 +849,6 @@ function analyzeLocalCollection(
   };
 }
 
-function downloadTextFile(content: string, filename: string, mimeType: string) {
-  const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
-}
-
-function csvEscape(value: unknown) {
-  const text = `${value ?? ""}`;
-  if (text.includes(",") || text.includes("\n") || text.includes('"')) {
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-  return text;
-}
 
 function FlowGraph({
   executions,
@@ -927,6 +860,7 @@ function FlowGraph({
   linkSourceIndex,
   onStartLink,
   onCompleteLink,
+  theme,
 }: {
   executions: Execution[];
   flowConnections: Record<number, number[]>;
@@ -937,219 +871,205 @@ function FlowGraph({
   linkSourceIndex: number | null;
   onStartLink: (sourceIndex: number) => void;
   onCompleteLink: (targetIndex: number) => void;
+  theme: "dark" | "light";
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
 
-  const nodeWidth = 270;
-  const nodeHeight = 108;
-  const minCanvasWidth = 960;
-  const canvasHeight = Math.max(
-    360,
-    ...Object.values(nodePositions).map((p) => p.y + nodeHeight + 40),
-    260,
-  );
+  const nodeWidth = 280;
+  const nodeHeight = 140;
+  
   const canvasWidth = Math.max(
-    minCanvasWidth,
-    ...Object.values(nodePositions).map((p) => p.x + nodeWidth + 80),
+    1200,
+    ...Object.values(nodePositions).map((p) => p.x + nodeWidth + 100)
   );
-
-  const nodePos = executions.map((_, index) => {
-    const lane = index % 2;
-    const col = Math.floor(index / 2);
-    return (
-      nodePositions[index] || { x: 30 + col * 320, y: lane === 0 ? 24 : 188 }
-    );
-  });
+  const canvasHeight = Math.max(
+    800,
+    ...Object.values(nodePositions).map((p) => p.y + nodeHeight + 100)
+  );
 
   useEffect(() => {
     if (draggingIndex === null) return;
-
     const handleMove = (event: MouseEvent) => {
       const container = containerRef.current;
       if (!container) return;
       const rect = container.getBoundingClientRect();
-      const nextX =
-        event.clientX -
-        rect.left +
-        container.scrollLeft -
-        dragOffsetRef.current.x;
-      const nextY =
-        event.clientY -
-        rect.top +
-        container.scrollTop -
-        dragOffsetRef.current.y;
-
-      onNodePositionChange(draggingIndex, {
-        x: Math.max(10, Math.min(canvasWidth - nodeWidth - 10, nextX)),
-        y: Math.max(10, nextY),
-      });
+      const nextX = event.clientX - rect.left + container.scrollLeft - dragOffsetRef.current.x;
+      const nextY = event.clientY - rect.top + container.scrollTop - dragOffsetRef.current.y;
+      onNodePositionChange(draggingIndex, { x: Math.max(0, nextX), y: Math.max(0, nextY) });
     };
-
-    const handleUp = () => {
-      setDraggingIndex(null);
-    };
-
+    const handleUp = () => setDraggingIndex(null);
     window.addEventListener("mousemove", handleMove);
     window.addEventListener("mouseup", handleUp);
     return () => {
       window.removeEventListener("mousemove", handleMove);
       window.removeEventListener("mouseup", handleUp);
     };
-  }, [draggingIndex, onNodePositionChange, canvasWidth]);
+  }, [draggingIndex, onNodePositionChange]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative overflow-auto rounded-[1.5rem] border border-white/10 bg-slate-950/35 p-3"
-    >
-      <div
-        className="relative"
-        style={{ width: canvasWidth, minHeight: canvasHeight }}
-      >
-        <svg
-          width={canvasWidth}
-          height={canvasHeight}
-          className="absolute inset-0"
-        >
+    <div ref={containerRef} className={cn(
+      "relative h-[calc(100vh-280px)] w-full overflow-auto rounded-[3rem] border backdrop-blur-3xl shadow-inner custom-scrollbar",
+      theme === "dark" ? "border-white/5 bg-slate-950/40" : "border-slate-200 bg-white"
+    )}>
+      <div className="absolute inset-0 opacity-10" style={{ 
+        backgroundImage: theme === "dark" 
+          ? 'radial-gradient(circle at 1.5px 1.5px, rgba(255,255,255,0.15) 1.5px, transparent 0)' 
+          : 'radial-gradient(circle at 1.5px 1.5px, rgba(0,0,0,0.1) 1.5px, transparent 0)', 
+        backgroundSize: '48px 48px' 
+      }} />
+      <div className="relative" style={{ width: canvasWidth, height: canvasHeight }}>
+        <svg width={canvasWidth} height={canvasHeight} className="absolute inset-0 pointer-events-none overflow-visible">
           {executions.flatMap((_, index) => {
             const fromIndexes = flowConnections[index] || [];
-            return fromIndexes
-              .filter(
-                (fromIndex) => Number.isFinite(fromIndex) && fromIndex >= 0,
-              )
-              .map((fromIndex) => {
-                const from = nodePos[fromIndex];
-                const to = nodePos[index];
-                if (!from || !to) return null;
-
-                const startX = from.x + nodeWidth;
-                const startY = from.y + nodeHeight / 2;
-                const endX = to.x;
-                const endY = to.y + nodeHeight / 2;
-                const midX = (startX + endX) / 2;
-
-                return (
-                  <path
-                    key={`edge-${fromIndex}-${index}`}
-                    d={`M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`}
-                    stroke="rgba(56,189,248,0.65)"
-                    strokeWidth="2.2"
-                    fill="none"
-                    strokeDasharray="6 4"
-                  />
-                );
-              })
-              .filter(Boolean);
+            return fromIndexes.map((fromIndex) => {
+              const from = nodePositions[fromIndex];
+              const to = nodePositions[index];
+              if (!from || !to) return null;
+              const startX = from.x + nodeWidth;
+              const startY = from.y + nodeHeight / 2;
+              const endX = to.x;
+              const endY = to.y + nodeHeight / 2;
+              const cp1X = startX + (endX - startX) * 0.4;
+              const cp2X = startX + (endX - startX) * 0.6;
+              return (
+                <path
+                  key={`edge-${fromIndex}-${index}`}
+                  d={`M ${startX} ${startY} C ${cp1X} ${startY}, ${cp2X} ${endY}, ${endX} ${endY}`}
+                  stroke={executions[index]?.passed === false ? "rgba(244,63,94,0.3)" : "rgba(99,102,241,0.35)"}
+                  strokeWidth="3"
+                  strokeDasharray={executions[index]?.passed === false ? "none" : "6 4"}
+                  fill="none"
+                  className={cn("transition-all duration-700", executions[index]?.passed && "animate-pulse")}
+                />
+              );
+            });
           })}
-
-          {linkSourceIndex !== null && nodePos[linkSourceIndex] && (
-            <circle
-              cx={nodePos[linkSourceIndex].x + nodeWidth + 4}
-              cy={nodePos[linkSourceIndex].y + nodeHeight / 2}
-              r="6"
-              fill="rgba(125,211,252,0.9)"
-            />
+          {linkSourceIndex !== null && nodePositions[linkSourceIndex] && (
+            <circle cx={nodePositions[linkSourceIndex].x + nodeWidth} cy={nodePositions[linkSourceIndex].y + nodeHeight / 2} r="8" fill="rgba(129,140,248,0.8)" className="animate-ping" />
           )}
         </svg>
 
         {executions.map((exec, index) => {
-          const pos = nodePos[index];
+          const pos = nodePositions[index] || { x: 40, y: 40 + index * 160 };
           const active = selectedIndex === index;
           return (
-            <div
-              key={`node-${exec.name}-${index}`}
+            <motion.div
+              layout
+              key={`node-${index}`}
               onClick={() => onSelect(index)}
               className={cn(
-                "absolute cursor-pointer rounded-[1.25rem] border p-3 text-left transition",
-                active
-                  ? "border-sky-400/60 bg-sky-500/15 shadow-[0_0_0_1px_rgba(56,189,248,0.45)]"
-                  : "border-white/10 bg-black/40 hover:bg-white/10",
+                "absolute cursor-pointer rounded-[2.5rem] border-2 p-6 transition-all duration-300 group shadow-2xl",
+                active 
+                  ? "border-indigo-500 bg-indigo-500/10 shadow-[0_30px_90px_rgba(79,70,229,0.3)] z-10 scale-105" 
+                  : (theme === "dark" ? "border-white/10 bg-slate-900/60 hover:border-white/30 hover:bg-slate-900/80" : "border-slate-200 bg-white hover:border-indigo-500/30 shadow-sm"),
+                exec.passed === false 
+                  ? (theme === "dark" ? "border-rose-500 bg-rose-500/15" : "border-rose-500 bg-rose-50") 
+                  : (exec.passed ? (theme === "dark" ? "border-emerald-500/50 bg-emerald-500/5" : "border-emerald-500 bg-emerald-50") : "")
               )}
-              style={{
-                width: nodeWidth,
-                height: nodeHeight,
-                left: pos.x,
-                top: pos.y,
-              }}
+              style={{ width: nodeWidth, height: nodeHeight, left: pos.x, top: pos.y }}
             >
-              <button
-                onMouseDown={(event) => {
-                  event.stopPropagation();
-                  const rect = (
-                    event.currentTarget.parentElement as HTMLDivElement
-                  ).getBoundingClientRect();
-                  dragOffsetRef.current = {
-                    x: event.clientX - rect.left,
-                    y: event.clientY - rect.top,
-                  };
-                  setDraggingIndex(index);
-                }}
-                className="absolute -top-2 left-2 rounded-full border border-white/15 bg-slate-900/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300"
-                title="Drag node"
-              >
-                Drag
-              </button>
+              <div onMouseDown={(e) => {
+                e.stopPropagation();
+                const rect = (e.currentTarget.parentElement as HTMLDivElement).getBoundingClientRect();
+                dragOffsetRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+                setDraggingIndex(index);
+              }} className="absolute top-4 right-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+                <GripVertical className="h-5 w-5 text-slate-500" />
+              </div>
 
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onCompleteLink(index);
-                }}
-                className={cn(
-                  "absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border transition",
-                  linkSourceIndex !== null
-                    ? "border-sky-300 bg-sky-400/80"
-                    : "border-slate-500 bg-slate-700/80",
-                )}
-                title="Connect to this node"
-              />
-
-              <button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onStartLink(index);
-                }}
-                className={cn(
-                  "absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border transition",
-                  linkSourceIndex === index
-                    ? "border-emerald-300 bg-emerald-400/85"
-                    : "border-slate-500 bg-slate-700/80",
-                )}
-                title="Start connection from this node"
-              />
-
-              <div className="flex items-center justify-between gap-2">
-                <span
-                  className={cn(
-                    "rounded-full border px-2 py-0.5 text-[10px] font-black uppercase",
-                    methodTone(exec.method),
-                  )}
-                >
+              <div className="flex items-center gap-3 mb-4">
+                <span className={cn("rounded-xl border px-3 py-1 text-[11px] font-black uppercase tracking-widest", methodTone(exec.method))}>
                   {exec.method}
                 </span>
-                <span
+                <div className={cn("h-2 w-2 rounded-full ml-auto animate-pulse", exec.passed === null ? "bg-slate-700" : exec.passed ? "bg-emerald-500" : "bg-rose-500")} />
+              </div>
+
+              <h4 className={cn("text-lg font-black truncate pr-8 leading-tight", theme === "dark" ? "text-white" : "text-slate-900")}>
+                {exec.name}
+              </h4>
+              
+              <div className={cn("mt-4 flex items-center justify-between border-t pt-4", theme === "dark" ? "border-white/5" : "border-slate-100")}>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Status</span>
+                  <span className={cn("text-xs font-black", exec.passed === null ? "text-slate-600" : (exec.passed ? (theme === "dark" ? "text-emerald-400" : "text-emerald-600") : (theme === "dark" ? "text-rose-400" : "text-rose-600")))}>
+                    {exec.passed === null ? "PENDING..." : exec.passed ? "PASSED" : `ERROR ${exec.status}`}
+                  </span>
+                </div>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); onStartLink(index); }} 
                   className={cn(
-                    "rounded-full border px-2 py-0.5 text-[10px] font-black uppercase",
-                    statusTone(exec.passed),
+                    "p-2 rounded-xl border transition-all",
+                    theme === "dark" ? "bg-white/5 border-white/10 hover:bg-indigo-500" : "bg-slate-50 border-slate-200 hover:bg-indigo-500 hover:text-white"
                   )}
                 >
-                  {exec.passed ? "PASS" : "FAIL"}
-                </span>
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
               </div>
-              <p className="mt-2 line-clamp-2 text-sm font-bold text-white">
-                {exec.name}
-              </p>
-              <p className="mt-1 text-[11px] text-slate-300">
-                {exec.expectedStatuses.length
-                  ? `Expected ${exec.expectedStatuses.join(", ")} | Actual ${exec.status}`
-                  : `Actual ${exec.status}`}
-              </p>
-            </div>
+
+              <button onClick={(e) => { e.stopPropagation(); onCompleteLink(index); }} className={cn("absolute -left-4 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full border-4 flex items-center justify-center transition-all", linkSourceIndex !== null ? "border-indigo-400 bg-indigo-500 scale-110" : "border-[#020617] bg-slate-800 opacity-0 group-hover:opacity-100 shadow-xl")}>
+                <div className="h-2 w-2 rounded-full bg-white/40" />
+              </button>
+            </motion.div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+interface MetricCardProps {
+  label: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+}
+
+function StepList({ 
+  executions, 
+  selectedIndex, 
+  onSelect, 
+  theme 
+}: { 
+  executions: any[]; 
+  selectedIndex: number | null; 
+  onSelect: (index: number) => void;
+  theme: "dark" | "light"; 
+}) {
+  return (
+    <div className="h-full overflow-y-auto p-8 space-y-4 custom-scrollbar">
+      {executions.map((exec, index) => (
+        <div 
+          key={index} 
+          onClick={() => onSelect(index)}
+          className={cn(
+            "flex items-center gap-6 p-6 rounded-[2rem] border cursor-pointer transition-all duration-300",
+            selectedIndex === index 
+              ? "border-indigo-500 bg-indigo-500/5 shadow-2xl scale-[1.02] z-10" 
+              : (theme === "dark" ? "border-white/5 bg-white/[0.02] hover:bg-white/[0.05]" : "border-slate-200 bg-white hover:border-indigo-200 shadow-sm")
+          )}
+        >
+          <div className={cn("h-3 w-3 rounded-full ring-4 shadow-sm", exec.passed === null ? "bg-slate-700 ring-slate-700/20" : (exec.passed ? "bg-emerald-500 ring-emerald-500/20" : "bg-rose-500 ring-rose-500/20 shadow-rose-500/40"))} />
+          <div className="flex-1 min-w-0">
+             <div className="flex items-center gap-3 mb-1.5">
+                <span className={cn("px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border", methodTone(exec.method))}>
+                  {exec.method}
+                </span>
+                <h4 className={cn("text-base font-black truncate", theme === "dark" ? "text-white" : "text-slate-900")}>{exec.name}</h4>
+             </div>
+             <p className="text-[11px] text-slate-500 font-mono truncate opacity-60 leading-tight">{exec.url}</p>
+          </div>
+          <div className="text-right">
+             <span className={cn("text-[11px] font-black tracking-widest uppercase", exec.passed === null ? "text-slate-600" : (exec.passed ? "text-emerald-500" : "text-rose-500"))}>
+               {exec.passed === null ? "PENDING" : (exec.passed ? "PASSED" : `FAILED ${exec.status}`)}
+             </span>
+             <p className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em] mt-1.5 opacity-60">
+               {exec.responseTime ? `${exec.responseTime}ms` : "---"}
+             </p>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -1159,542 +1079,41 @@ function MetricCard({
   value,
   icon: Icon,
   accent,
-}: {
-  label: string;
-  value: number;
-  icon: React.ComponentType<{ className?: string }>;
-  accent: string;
-}) {
+  theme,
+}: MetricCardProps & { theme: "dark" | "light" }) {
   return (
-    <div className="rounded-3xl border border-white/8 bg-white/5 p-4 sm:p-5 backdrop-blur-xl shadow-[0_16px_60px_rgba(2,6,23,0.35)]">
+    <div className={cn(
+      "rounded-3xl border p-4 sm:p-5 backdrop-blur-xl transition-all duration-300",
+      theme === "dark" 
+        ? "border-white/8 bg-white/5 shadow-[0_16px_60px_rgba(2,6,23,0.35)]" 
+        : "border-slate-200 bg-white shadow-[0_16px_60px_rgba(0,0,0,0.05)]"
+    )}>
       <div className="flex items-center gap-4">
         <div className={cn("rounded-2xl p-3 ring-1 ring-inset", accent)}>
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+          <p className={cn("text-[10px] font-bold uppercase tracking-[0.22em]", theme === "dark" ? "text-slate-400" : "text-slate-500")}>
             {label}
           </p>
-          <p className="mt-1 text-2xl font-black text-white">{value}</p>
+          <p className={cn("mt-1 text-2xl font-black", theme === "dark" ? "text-white" : "text-slate-900")}>{value}</p>
         </div>
       </div>
     </div>
   );
 }
 
-function SetupWizard({
-  collections,
-  environments,
-  selectedCollection,
-  selectedEnv,
-  baseUrl,
-  role,
-  username,
-  password,
-  analysis,
-  loading,
-  onChooseCollection,
-  onSelectEnv,
-  onBaseUrlChange,
-  onRoleChange,
-  onUsernameChange,
-  onPasswordChange,
-  onImportCollectionFile,
-  onImportEnvironmentFile,
-  selectedCollectionContent,
-  selectedEnvironmentContent,
-  onCollectionContentChange,
-  onEnvironmentContentChange,
-  onApplyCollectionEdits,
-  onApplyEnvironmentEdits,
-  onRunCollection,
-  onOpenDashboard,
-}: {
-  collections: Item[];
-  environments: Item[];
-  selectedCollection: Item | null;
-  selectedEnv: Item | null;
-  baseUrl: string;
-  role: string;
-  username: string;
-  password: string;
-  analysis: AnalysisResult | null;
-  loading: boolean;
-  onChooseCollection: (item: Item) => void;
-  onSelectEnv: (item: Item | null) => void;
-  onBaseUrlChange: (value: string) => void;
-  onRoleChange: (value: string) => void;
-  onUsernameChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
-  onImportCollectionFile: (file: File) => Promise<void>;
-  onImportEnvironmentFile: (file: File) => Promise<void>;
-  selectedCollectionContent: string;
-  selectedEnvironmentContent: string;
-  onCollectionContentChange: (value: string) => void;
-  onEnvironmentContentChange: (value: string) => void;
-  onApplyCollectionEdits: () => void;
-  onApplyEnvironmentEdits: () => void;
-  onRunCollection: () => Promise<void>;
-  onOpenDashboard: () => void;
-}) {
-  const [collectionDraft, setCollectionDraft] = useState("");
-  const [environmentDraft, setEnvironmentDraft] = useState("");
-
-  const importDraft = async (kind: "collection" | "environment") => {
-    const draft = kind === "collection" ? collectionDraft : environmentDraft;
-    if (!draft.trim()) return;
-
-    const file = new File([draft], `${kind}-draft-${Date.now()}.json`, {
-      type: "application/json",
-    });
-
-    if (kind === "collection") {
-      await onImportCollectionFile(file);
-      setCollectionDraft("");
-    } else {
-      await onImportEnvironmentFile(file);
-      setEnvironmentDraft("");
-    }
-  };
-
-  const steps = [
-    {
-      title: "1. Load a collection",
-      detail:
-        "Upload a Postman collection JSON or paste one directly into the editor.",
-      icon: FileJson,
-    },
-    {
-      title: "2. Attach an environment",
-      detail:
-        "Pick an existing environment or import a JSON file with base_url, auth keys, and variables.",
-      icon: Database,
-    },
-    {
-      title: "3. Review preflight checks",
-      detail:
-        "The app validates missing environment variables and status expectations before run.",
-      icon: TriangleAlert,
-    },
-    {
-      title: "4. Add schema and run",
-      detail:
-        "Choose a validation schema, run the collection, then inspect status + schema verdicts.",
-      icon: Play,
-    },
-  ];
-
-  return (
-    <section className="space-y-5 rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-        <div className="max-w-3xl">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-sky-300/80">
-            Setup wizard
-          </p>
-          <h3 className="mt-2 text-2xl font-black text-white">
-            Add a collection, configure the environment, then run the tests
-          </h3>
-          <p className="mt-2 text-sm leading-7 text-slate-300">
-            This page gives you one structured place to upload a collection, add
-            environment values, verify the preflight warnings, and launch the
-            run once the data looks ready.
-          </p>
-        </div>
-
-        <button
-          onClick={onOpenDashboard}
-          className="inline-flex items-center gap-2 self-start rounded-2xl border border-white/10 bg-slate-950/35 px-4 py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-200 transition hover:bg-white/10"
-        >
-          <ArrowRight className="h-4 w-4" />
-          Go to dashboard
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
-        {steps.map((step) => {
-          const Icon = step.icon;
-          return (
-            <div
-              key={step.title}
-              className="rounded-[1.5rem] border border-white/10 bg-slate-950/35 p-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-sky-500/15 p-3 text-sky-300 ring-1 ring-inset ring-sky-500/20">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <h4 className="text-sm font-black text-white">{step.title}</h4>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
-                {step.detail}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-        <div className="space-y-4 rounded-[1.75rem] border border-white/10 bg-slate-950/35 p-4">
-          <div className="flex items-center gap-2">
-            <Upload className="h-4 w-4 text-sky-300" />
-            <h4 className="text-sm font-black text-white">
-              Import a collection JSON
-            </h4>
-          </div>
-          <label className="block rounded-[1.5rem] border border-dashed border-white/15 bg-black/20 p-4 text-sm text-slate-300">
-            <span className="mb-2 block text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
-              Upload file
-            </span>
-            <input
-              type="file"
-              accept="application/json,.json"
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) {
-                  void onImportCollectionFile(file);
-                }
-                event.currentTarget.value = "";
-              }}
-              className="block w-full text-sm text-slate-300 file:mr-4 file:rounded-2xl file:border-0 file:bg-sky-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-sky-400"
-            />
-          </label>
-          <textarea
-            value={collectionDraft}
-            onChange={(event) => setCollectionDraft(event.target.value)}
-            placeholder='Paste a collection JSON here, then click "Import pasted collection".'
-            className="min-h-[180px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-          />
-          <button
-            onClick={() => void importDraft("collection")}
-            className="inline-flex items-center gap-2 rounded-2xl bg-sky-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-sky-400 disabled:opacity-50"
-            disabled={!collectionDraft.trim()}
-          >
-            Import pasted collection
-          </button>
-          <textarea
-            value={selectedCollectionContent}
-            onChange={(event) => onCollectionContentChange(event.target.value)}
-            placeholder='Edit selected collection JSON here, then click "Apply collection edits".'
-            className="min-h-[180px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-          />
-          <button
-            onClick={onApplyCollectionEdits}
-            className="inline-flex items-center gap-2 rounded-2xl border border-sky-500/25 bg-sky-500/10 px-4 py-3 text-sm font-bold text-sky-100 transition hover:bg-sky-500/20"
-          >
-            Apply collection edits
-          </button>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="space-y-2 text-sm text-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                Select collection
-              </span>
-              <div className="relative">
-                <select
-                  value={selectedCollection?.filename || ""}
-                  onChange={(event) => {
-                    const item =
-                      collections.find(
-                        (entry) => entry.filename === event.target.value,
-                      ) || null;
-                    if (item) onChooseCollection(item);
-                  }}
-                  className="w-full appearance-none rounded-2xl border border-white/10 bg-black/25 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                >
-                  <option value="">Choose a collection</option>
-                  {collections.map((item) => (
-                    <option key={item.filename} value={item.filename}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-slate-500" />
-              </div>
-            </label>
-
-            <label className="space-y-2 text-sm text-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                Select environment
-              </span>
-              <div className="relative">
-                <select
-                  value={selectedEnv?.filename || ""}
-                  onChange={(event) => {
-                    const item =
-                      environments.find(
-                        (entry) => entry.filename === event.target.value,
-                      ) || null;
-                    onSelectEnv(item);
-                  }}
-                  className="w-full appearance-none rounded-2xl border border-white/10 bg-black/25 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                >
-                  <option value="">Run without a saved environment</option>
-                  {environments.map((item) => (
-                    <option key={item.filename} value={item.filename}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-slate-500" />
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div className="space-y-4 rounded-[1.75rem] border border-white/10 bg-slate-950/35 p-4">
-          <div className="flex items-center gap-2">
-            <Database className="h-4 w-4 text-violet-300" />
-            <h4 className="text-sm font-black text-white">
-              Import or edit an environment
-            </h4>
-          </div>
-          <label className="block rounded-[1.5rem] border border-dashed border-white/15 bg-black/20 p-4 text-sm text-slate-300">
-            <span className="mb-2 block text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
-              Upload environment file
-            </span>
-            <input
-              type="file"
-              accept="application/json,.json"
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) {
-                  void onImportEnvironmentFile(file);
-                }
-                event.currentTarget.value = "";
-              }}
-              className="block w-full text-sm text-slate-300 file:mr-4 file:rounded-2xl file:border-0 file:bg-violet-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-violet-400"
-            />
-          </label>
-
-          <textarea
-            value={environmentDraft}
-            onChange={(event) => setEnvironmentDraft(event.target.value)}
-            placeholder='Paste an environment JSON here, then click "Import pasted environment".'
-            className="min-h-[180px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
-          />
-          <button
-            onClick={() => void importDraft("environment")}
-            className="inline-flex items-center gap-2 rounded-2xl bg-violet-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-violet-400 disabled:opacity-50"
-            disabled={!environmentDraft.trim()}
-          >
-            Import pasted environment
-          </button>
-          <textarea
-            value={selectedEnvironmentContent}
-            onChange={(event) => onEnvironmentContentChange(event.target.value)}
-            placeholder='Edit selected environment JSON here, then click "Apply environment edits".'
-            className="min-h-[180px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
-          />
-          <button
-            onClick={onApplyEnvironmentEdits}
-            className="inline-flex items-center gap-2 rounded-2xl border border-violet-500/25 bg-violet-500/10 px-4 py-3 text-sm font-bold text-violet-100 transition hover:bg-violet-500/20"
-          >
-            Apply environment edits
-          </button>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
-            <label className="space-y-2 text-sm text-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                Base URL
-              </span>
-              <input
-                value={baseUrl}
-                onChange={(event) => onBaseUrlChange(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                placeholder="http://127.0.0.1:9000"
-              />
-            </label>
-            <label className="space-y-2 text-sm text-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                Role
-              </span>
-              <input
-                value={role}
-                onChange={(event) => onRoleChange(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                placeholder="admin"
-              />
-            </label>
-            <label className="space-y-2 text-sm text-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                Username
-              </span>
-              <input
-                value={username}
-                onChange={(event) => onUsernameChange(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                placeholder="admin"
-              />
-            </label>
-            <label className="space-y-2 text-sm text-slate-300">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                Password
-              </span>
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => onPasswordChange(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                placeholder="Test123!"
-              />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-[1.75rem] border border-white/10 bg-slate-950/35 p-4">
-          <div className="flex items-center gap-2">
-            <ClipboardList className="h-4 w-4 text-emerald-300" />
-            <h4 className="text-sm font-black text-white">Preflight summary</h4>
-          </div>
-
-          {analysis ? (
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <MetricCard
-                label="Requests"
-                value={analysis.summary.totalRequests}
-                icon={Activity}
-                accent="bg-sky-500/15 text-sky-300 border-sky-500/20"
-              />
-              <MetricCard
-                label="With expected status"
-                value={analysis.summary.requestsWithExpectedStatuses}
-                icon={CheckCircle2}
-                accent="bg-emerald-500/15 text-emerald-300 border-emerald-500/20"
-              />
-              <MetricCard
-                label="Missing env vars"
-                value={analysis.summary.missingEnvironmentVariables || 0}
-                icon={TriangleAlert}
-                accent="bg-amber-500/15 text-amber-300 border-amber-500/20"
-              />
-              <MetricCard
-                label="Missing schema links"
-                value={analysis.summary.requestsMissingSchema || 0}
-                icon={Workflow}
-                accent="bg-violet-500/15 text-violet-300 border-violet-500/20"
-              />
-            </div>
-          ) : (
-            <p className="mt-4 text-sm leading-7 text-slate-300">
-              Select or import a collection to validate expected statuses,
-              required environment variables, and schema readiness before run.
-            </p>
-          )}
-
-          <div className="mt-4 space-y-3">
-            {(analysis?.issues || []).length > 0 ? (
-              analysis?.issues.map((issue, index) => (
-                <div
-                  key={`${issue.title}-${index}`}
-                  className={cn(
-                    "rounded-2xl border p-4",
-                    issue.kind === "error"
-                      ? "border-rose-500/20 bg-rose-500/10"
-                      : issue.kind === "warning"
-                        ? "border-amber-500/20 bg-amber-500/10"
-                        : "border-sky-500/20 bg-sky-500/10",
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-white/80" />
-                    <div>
-                      <p className="text-sm font-black text-white">
-                        {issue.title}
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-white/90">
-                        {issue.detail}
-                      </p>
-                      <p className="mt-2 text-xs leading-6 text-white/80">
-                        <span className="font-black uppercase tracking-[0.22em]">
-                          Fix:
-                        </span>{" "}
-                        {issue.resolution}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-                No blocking warnings yet. The collection is ready for
-                status-based and schema-based validation.
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4 rounded-[1.75rem] border border-white/10 bg-slate-950/35 p-4">
-          <div className="flex items-center gap-2">
-            <Play className="h-4 w-4 text-sky-300" />
-            <h4 className="text-sm font-black text-white">Run and feedback</h4>
-          </div>
-          <div className="space-y-3 text-sm leading-7 text-slate-300">
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              {selectedCollection ? (
-                <>
-                  Current collection:{" "}
-                  <span className="font-bold text-white">
-                    {selectedCollection.name}
-                  </span>
-                </>
-              ) : (
-                "Choose or import a collection to continue."
-              )}
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              {selectedEnv ? (
-                <>
-                  Current environment:{" "}
-                  <span className="font-bold text-white">
-                    {selectedEnv.name}
-                  </span>
-                </>
-              ) : (
-                "Environment is optional, but a saved environment makes runs repeatable."
-              )}
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              Base URL in use:{" "}
-              <span className="font-bold text-white">
-                {baseUrl || "not set"}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={() => void onRunCollection()}
-            disabled={loading || !selectedCollection}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-4 text-sm font-bold text-white shadow-[0_14px_40px_rgba(59,130,246,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
-            {loading ? "Running" : "Run collection now"}
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export default function App() {
-  const MOBILE_MENU_BACKDROP_Z = 2147483600;
-  const MOBILE_MENU_PANEL_Z = 2147483601;
 
+
+  const [schemas, setSchemas] = useState<SchemaItem[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const { isLoaded, user } = useUser();
   const oauthCallbackPath = "/sso-callback";
   const [collections, setCollections] = useState<Item[]>([]);
   const [environments, setEnvironments] = useState<Item[]>([]);
-  const [schemas, setSchemas] = useState<SchemaItem[]>([]);
   const [selectedSchemaId, setSelectedSchemaId] = useState<string>("");
-  const [schemaNameDraft, setSchemaNameDraft] = useState(
-    "Default response schema",
-  );
-  const [schemaContentDraft, setSchemaContentDraft] = useState(
-    '{\n  "default": {\n    "type": "object"\n  },\n  "requests": {}\n}',
-  );
   const [selectedCollection, setSelectedCollection] = useState<Item | null>(
     null,
   );
@@ -1707,8 +1126,10 @@ export default function App() {
   const [showActiveConfigPassword, setShowActiveConfigPassword] =
     useState(false);
   const [windowWidth, setWindowWidth] = useState(() => window.innerWidth);
-  const [activePage, setActivePage] = useState<"setup" | "dashboard">("setup");
-  const [flowViewMode, setFlowViewMode] = useState<"graph" | "list">("graph");
+  const [activePage, setActivePage] = useState<"projects" | "workspace">("projects");
+  const [workspaceView, setWorkspaceView] = useState<"graph" | "list">("graph");
+
+  const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
   const [flowNodePositions, setFlowNodePositions] = useState<
     Record<number, { x: number; y: number }>
   >({});
@@ -1727,7 +1148,6 @@ export default function App() {
   ]);
   const [selectedCredentialProfileId, setSelectedCredentialProfileId] =
     useState("cred-admin");
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [flowConnections, setFlowConnections] = useState<
     Record<number, number[]>
   >({});
@@ -1751,6 +1171,16 @@ export default function App() {
   const isMobile = windowWidth < 1024;
   const isSidebarOpen = isMobile ? mobileMenuOpen : desktopSidebarOpen;
 
+  const getAssetKey = (item: Item | null) => {
+    if (!item) return null;
+    // For DB assets, use the UUID
+    if (item.filename.startsWith("db-collections/")) {
+      return item.filename.replace("db-collections/", "");
+    }
+    // For non-DB assets, use the filename as a stable key for isolation
+    return item.filename;
+  };
+
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -1768,33 +1198,10 @@ export default function App() {
 
     const fetchData = async () => {
       try {
-        const [collRes, envRes, profileRes, schemaRes] = await Promise.all([
-          axios.get(`${API_BASE}/collections`, { headers: authHeaders }),
-          axios.get(`${API_BASE}/environments`, { headers: authHeaders }),
-          axios.get(`${API_BASE}/credential-profiles`, {
-            headers: authHeaders,
-          }),
-          axios.get(`${API_BASE}/schemas`, { headers: authHeaders }),
-        ]);
+        const collRes = await axios.get(`${API_BASE}/collections`, { headers: authHeaders });
         setCollections(collRes.data);
-        setEnvironments(envRes.data);
-        if (envRes.data.length > 0) setSelectedEnv(envRes.data[0]);
-
-        const nextProfiles = Array.isArray(profileRes.data)
-          ? profileRes.data
-          : [];
-        if (nextProfiles.length > 0) {
-          setCredentialProfiles(nextProfiles);
-          setSelectedCredentialProfileId(nextProfiles[0].id);
-        }
-
-        const nextSchemas = Array.isArray(schemaRes.data) ? schemaRes.data : [];
-        setSchemas(nextSchemas);
-        if (!selectedSchemaId && nextSchemas.length > 0) {
-          setSelectedSchemaId(nextSchemas[0].id);
-        }
       } catch (error) {
-        console.error("Failed to fetch data", error);
+        console.error("Failed to fetch collections", error);
       }
     };
 
@@ -1806,6 +1213,75 @@ export default function App() {
       setSelectedCollection(collections[0]);
     }
   }, [collections, selectedCollection]);
+
+  // Handle workspace isolation: Refresh envs/schemas when collection changes
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+    
+    // Only fetch scoped assets if we have a selected collection
+    // Otherwise, and specifically for environments, we might want a global list 
+    // BUT the user asked for isolation, so we filter.
+    const collectionKey = getAssetKey(selectedCollection);
+    
+    const fetchScopedAssets = async () => {
+      // If no collection is selected, we should clear the scoped assets
+      // to maintain absolute isolation and prevent "leaks"
+      if (!collectionKey) {
+        setEnvironments([]);
+        setSelectedEnv(null);
+        setSchemas([]);
+        setSelectedSchemaId("");
+        setCredentialProfiles([]);
+        return;
+      }
+
+      try {
+        const [envRes, schemaRes, profileRes] = await Promise.all([
+          axios.get(`${API_BASE}/environments`, { 
+            headers: authHeaders,
+            params: { parentCollectionKey: collectionKey }
+          }),
+          axios.get(`${API_BASE}/schemas`, { 
+            headers: authHeaders,
+            params: { parentCollectionKey: collectionKey }
+          }),
+          axios.get(`${API_BASE}/credential-profiles`, {
+            headers: authHeaders,
+            params: { parentCollectionKey: collectionKey }
+          }),
+        ]);
+        
+        const nextEnvs = Array.isArray(envRes.data) ? envRes.data : [];
+        setEnvironments(nextEnvs);
+        if (nextEnvs.length > 0 && (!selectedEnv || !nextEnvs.find(e => e.filename === selectedEnv.filename))) {
+          setSelectedEnv(nextEnvs[0]);
+        } else if (nextEnvs.length === 0) {
+          setSelectedEnv(null);
+        }
+
+        const nextSchemas = Array.isArray(schemaRes.data) ? schemaRes.data : [];
+        setSchemas(nextSchemas);
+        if (nextSchemas.length > 0 && (!selectedSchemaId || !nextSchemas.find(s => s.id === selectedSchemaId))) {
+          setSelectedSchemaId(nextSchemas[0].id);
+        } else if (nextSchemas.length === 0) {
+          setSelectedSchemaId("");
+        }
+
+        const nextProfiles = Array.isArray(profileRes.data) ? profileRes.data : [];
+        setCredentialProfiles(nextProfiles);
+        if (nextProfiles.length > 0 && (!selectedCredentialProfileId || !nextProfiles.find(p => p.id === selectedCredentialProfileId))) {
+          setSelectedCredentialProfileId(nextProfiles[0].id);
+        } else if (nextProfiles.length === 0) {
+          // Keep a default dummy profile if none exist? 
+          // Actually, better to just let it be empty if that's what the user wants for isolation.
+        }
+      } catch (error) {
+        console.error("Failed to fetch scoped assets", error);
+      }
+    };
+
+    fetchScopedAssets();
+  }, [selectedCollection, user, isLoaded]);
 
   useEffect(() => {
     if (!selectedCollection) {
@@ -1823,9 +1299,11 @@ export default function App() {
             ? environmentContentByFilename[selectedEnv.filename]
             : null;
           const collectionDoc = JSON.parse(collectionSource);
-          const environmentDoc = environmentSource
-            ? JSON.parse(environmentSource)
-            : null;
+          const environmentDoc = environmentSource ? JSON.parse(environmentSource) : null;
+          const meta = collectionDoc.nexus_metadata || {};
+          if (meta.flowConnections) setFlowConnections(meta.flowConnections);
+          if (meta.flowNodePositions) setFlowNodePositions(meta.flowNodePositions);
+
           setAnalysis(
             analyzeLocalCollection(
               collectionDoc,
@@ -1851,6 +1329,11 @@ export default function App() {
             signal: controller.signal,
           });
           setAnalysis(response.data);
+          if (response.data?.nexusMetadata) {
+            const meta = response.data.nexusMetadata;
+            if (meta.flowConnections) setFlowConnections(meta.flowConnections);
+            if (meta.flowNodePositions) setFlowNodePositions(meta.flowNodePositions);
+          }
         }
       } catch (error) {
         if (
@@ -1878,47 +1361,96 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    if (!results?.executions?.length) {
-      setFlowConnections({});
-      setFlowNodePositions({});
-      setLinkSourceIndex(null);
-      return;
-    }
+    const total = results?.executions?.length || analysis?.summary.totalRequests || 0;
+    if (total === 0) return;
 
     setFlowConnections((current) => {
-      const next: Record<number, number[]> = {};
-      results.executions.forEach((_, index) => {
-        next[index] = current[index] ?? (index === 0 ? [] : [index - 1]);
-      });
+      const next: Record<number, number[]> = { ...current };
+      for (let i = 0; i < total; i++) {
+        if (next[i] === undefined) {
+          next[i] = i === 0 ? [] : [i - 1];
+        }
+      }
       return next;
     });
 
     setFlowNodePositions((current) => {
       const stepX = 320;
       const laneY = [24, 188];
-      const next: Record<number, { x: number; y: number }> = {};
-      results.executions.forEach((_, index) => {
-        const lane = index % 2;
-        const col = Math.floor(index / 2);
-        next[index] = current[index] || {
-          x: 30 + col * stepX,
-          y: laneY[lane],
-        };
-      });
+      const next: Record<number, { x: number; y: number }> = { ...current };
+      for (let i = 0; i < total; i++) {
+        const lane = i % 2;
+        const col = Math.floor(i / 2);
+        if (next[i] === undefined) {
+          next[i] = { x: 30 + col * stepX, y: laneY[lane] };
+        }
+      }
       return next;
     });
-  }, [results]);
+  }, [results, analysis]);
+
+  const saveWorkspaceState = useCallback(
+    async (
+      connections: Record<number, number[]>,
+      positions: Record<number, { x: number; y: number }>,
+    ) => {
+      if (!selectedCollection || !isLoaded || !user) return;
+
+      try {
+        const rawContent = collectionContentByFilename[selectedCollection.filename];
+        if (!rawContent) return;
+
+        const doc = JSON.parse(rawContent);
+        doc.nexus_metadata = {
+          flowConnections: connections,
+          flowNodePositions: positions,
+        };
+
+        const updatedContent = JSON.stringify(doc, null, 2);
+        await axios.post(
+          `${API_BASE}/import`,
+          {
+            kind: "collection",
+            filename: selectedCollection.filename,
+            content: updatedContent,
+            source: "nexus_workspace",
+          },
+          { headers: authHeaders },
+        );
+
+        setCollectionContentByFilename((curr) => ({
+          ...curr,
+          [selectedCollection.filename]: updatedContent,
+        }));
+      } catch (e) {
+        console.error("Failed to save workspace state", e);
+      }
+    },
+    [selectedCollection, isLoaded, user, collectionContentByFilename],
+  );
+
+  useEffect(() => {
+    if (!selectedCollection) return;
+    const timer = setTimeout(() => {
+      if (Object.keys(flowConnections).length > 0 || Object.keys(flowNodePositions).length > 0) {
+         void saveWorkspaceState(flowConnections, flowNodePositions);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [flowConnections, flowNodePositions, selectedCollection, saveWorkspaceState]);
 
   const syncCredentialProfile = async (profile: CredentialProfile) => {
     try {
       const response = await axios.post(
         `${API_BASE}/credential-profiles`,
-        { profile },
+        { 
+          profile,
+          parentCollectionKey: getAssetKey(selectedCollection)
+        },
         { headers: authHeaders },
       );
       if (
-        Array.isArray(response.data?.items) &&
-        response.data.items.length > 0
+        Array.isArray(response.data?.items)
       ) {
         setCredentialProfiles(response.data.items);
       }
@@ -1962,7 +1494,10 @@ export default function App() {
     try {
       const response = await axios.delete(
         `${API_BASE}/credential-profiles/${encodeURIComponent(id)}`,
-        { headers: authHeaders },
+        { 
+          headers: authHeaders,
+          params: { parentCollectionKey: getAssetKey(selectedCollection) }
+        },
       );
       if (Array.isArray(response.data?.items)) {
         setCredentialProfiles(response.data.items);
@@ -1991,124 +1526,23 @@ export default function App() {
   };
 
   const pushNotification = (item: Omit<NotificationItem, "id">) => {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
     setNotifications((current) =>
       [
-        { id: Date.now() + Math.floor(Math.random() * 1000), ...item },
+        { id, ...item },
         ...current,
       ].slice(0, 4),
     );
+    
+    // Auto-dismiss after 6 seconds
+    setTimeout(() => {
+      setNotifications(current => current.filter(n => n.id !== id));
+    }, 6000);
   };
 
-  const dismissNotification = (id: number) => {
-    setNotifications((current) => current.filter((item) => item.id !== id));
-  };
 
-  const saveSchemaDraft = async () => {
-    try {
-      const parsedSchema = JSON.parse(schemaContentDraft);
-      if (typeof parsedSchema !== "object" || parsedSchema === null) {
-        pushNotification({
-          kind: "warning",
-          title: "Schema must be a JSON object",
-          detail:
-            "Only JSON object schemas are supported for validation and storage.",
-          resolution:
-            "Upload or paste a valid JSON object schema (not an array, number, or string).",
-        });
-        return;
-      }
-      const response = await axios.post(
-        `${API_BASE}/schemas`,
-        {
-          name: schemaNameDraft.trim() || `Schema ${new Date().toISOString()}`,
-          schema: parsedSchema,
-        },
-        { headers: authHeaders },
-      );
 
-      const items = Array.isArray(response.data?.items)
-        ? response.data.items
-        : [];
-      setSchemas(items);
-      if (response.data?.saved?.id) {
-        setSelectedSchemaId(response.data.saved.id);
-      }
 
-      pushNotification({
-        kind: "success",
-        title: "Validation schema saved",
-        detail:
-          "Schema rules are now linked to your account and can be reused on future runs.",
-        resolution:
-          "Select this schema in setup or sidebar, then run to validate status and response structure.",
-      });
-    } catch (error) {
-      pushNotification(buildTroubleshootingNotification(error, "Schema save"));
-    }
-  };
-
-  const importSchemaFile = async (file: File) => {
-    const isJsonByName = file.name.toLowerCase().endsWith(".json");
-    const isJsonByMime =
-      file.type === "application/json" || file.type === "text/json";
-
-    if (!isJsonByName && !isJsonByMime) {
-      pushNotification({
-        kind: "warning",
-        title: "Only JSON schema files are allowed",
-        detail: "This upload accepts only .json files for schema validation.",
-        resolution: "Rename/export the file as .json and try again.",
-      });
-      return;
-    }
-
-    const content = await file.text();
-    const byteLength = new TextEncoder().encode(content).length;
-    if (byteLength > MAX_SCHEMA_JSON_BYTES) {
-      pushNotification({
-        kind: "warning",
-        title: "Schema file is too large",
-        detail: "The schema exceeds the 256KB upload limit.",
-        resolution:
-          "Reduce schema size (remove unrelated examples/metadata) and re-upload.",
-      });
-      return;
-    }
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      pushNotification({
-        kind: "error",
-        title: "Invalid JSON file",
-        detail: "The uploaded file is not valid JSON.",
-        resolution: "Fix JSON syntax and upload a valid .json schema file.",
-      });
-      return;
-    }
-
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-      pushNotification({
-        kind: "warning",
-        title: "Schema must be a JSON object",
-        detail:
-          "Validation schema uploads must contain a top-level JSON object.",
-        resolution: "Use an object-based schema file and upload again.",
-      });
-      return;
-    }
-
-    const schemaNameFromFile = file.name.replace(/\.json$/i, "").trim();
-    setSchemaNameDraft(schemaNameFromFile || schemaNameDraft);
-    setSchemaContentDraft(JSON.stringify(parsed, null, 2));
-    pushNotification({
-      kind: "success",
-      title: "Schema file loaded",
-      detail: "JSON schema content has been loaded into the editor.",
-      resolution: "Review it, then click Save schema.",
-    });
-  };
 
   const refreshAnalysis = async (
     collectionItem?: Item | null,
@@ -2204,6 +1638,7 @@ export default function App() {
         setSelectedCollection(null);
         setResults(null);
         setExpandedId(null);
+        setActivePage("projects");
       }
 
       pushNotification({
@@ -2220,109 +1655,11 @@ export default function App() {
     }
   };
 
-  const exportRows = (data: TestResults) =>
-    data.executions.map((exec) => ({
-      name: exec.name,
-      method: exec.method,
-      url: exec.url,
-      expected: exec.expectedStatuses.length
-        ? exec.expectedStatuses.join("|")
-        : "",
-      actual: exec.status,
-      verdict: exec.passed ? "PASS" : "FAIL",
-      responseTimeMs: exec.responseTime,
-    }));
-
-  const exportResultsAsJson = () => {
-    if (!results) return;
-    downloadTextFile(
-      JSON.stringify(results, null, 2),
-      `api-tester-report-${Date.now()}.json`,
-      "application/json",
-    );
-  };
-
-  const exportResultsAsCsv = () => {
-    if (!results) return;
-    const rows = exportRows(results);
-    const headers = [
-      "name",
-      "method",
-      "url",
-      "expected",
-      "actual",
-      "verdict",
-      "responseTimeMs",
-    ];
-    const csv = [
-      headers.join(","),
-      ...rows.map((row) =>
-        headers
-          .map((key) => csvEscape((row as Record<string, unknown>)[key]))
-          .join(","),
-      ),
-    ].join("\n");
-
-    downloadTextFile(
-      csv,
-      `api-tester-report-${Date.now()}.csv`,
-      "text/csv;charset=utf-8",
-    );
-  };
-
-  const exportResultsAsExcel = () => {
-    if (!results) return;
-    const rows = exportRows(results);
-    const tableRows = rows
-      .map(
-        (row) =>
-          `<tr><td>${row.name}</td><td>${row.method}</td><td>${row.url}</td><td>${row.expected}</td><td>${row.actual}</td><td>${row.verdict}</td><td>${row.responseTimeMs}</td></tr>`,
-      )
-      .join("");
-
-    const html = `\n      <html><head><meta charset="utf-8" /></head><body>\n      <table border="1"><tr><th>Name</th><th>Method</th><th>URL</th><th>Expected</th><th>Actual</th><th>Verdict</th><th>Response Time (ms)</th></tr>${tableRows}</table>\n      </body></html>\n    `;
-    downloadTextFile(
-      html,
-      `api-tester-report-${Date.now()}.xls`,
-      "application/vnd.ms-excel",
-    );
-  };
-
-  const exportResultsAsPdf = () => {
-    if (!results) return;
-    const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let cursorY = 40;
-
-    doc.setFontSize(16);
-    doc.text("API Tester Report", 40, cursorY);
-    cursorY += 20;
-
-    doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toISOString()}`, 40, cursorY);
-    cursorY += 24;
-
-    for (const row of exportRows(results)) {
-      const line = `${row.verdict} | ${row.method} | ${row.name} | expected ${row.expected || "none"} | actual ${row.actual}`;
-      const wrapped = doc.splitTextToSize(line, pageWidth - 80);
-      if (cursorY > 770) {
-        doc.addPage();
-        cursorY = 40;
-      }
-      doc.text(wrapped, 40, cursorY);
-      cursorY += wrapped.length * 12 + 6;
-    }
-
-    doc.save(`api-tester-report-${Date.now()}.pdf`);
-  };
-
   const importJsonFile = async (
     kind: "collection" | "environment",
     file: File,
   ) => {
     const content = await file.text();
-    JSON.parse(content);
-
     try {
       const response = await axios.post(
         `${API_BASE}/import`,
@@ -2330,6 +1667,7 @@ export default function App() {
           kind,
           filename: file.name,
           content,
+          parentCollectionKey: kind === "environment" ? getAssetKey(selectedCollection) : null,
         },
         {
           headers: authHeaders,
@@ -2390,9 +1728,11 @@ export default function App() {
           /[^a-zA-Z0-9._/-]+/g,
           "-",
         );
-      const importedItem = {
+      const importedItem: Item = {
         name: file.name.replace(/\.json$/i, ""),
         filename: `${kind === "collection" ? "collections" : "environments"}/${localFilename.endsWith(".json") ? localFilename : `${localFilename}.json`}`,
+        source: "local",
+        updatedAt: new Date().toISOString(),
       };
 
       if (kind === "collection") {
@@ -2466,7 +1806,7 @@ export default function App() {
     setLoading(true);
     setResults(null);
     setExpandedId(null);
-    setActivePage("dashboard");
+    setActivePage("workspace");
 
     const currentAnalysis = await refreshAnalysis();
     if (currentAnalysis?.issues?.length) {
@@ -2516,121 +1856,21 @@ export default function App() {
     setSelectedCollection(item);
     setResults(null);
     setExpandedId(null);
-    setActivePage("dashboard");
+    setActivePage("workspace");
     if (isMobile) setMobileMenuOpen(false);
   };
 
-  const updateSelectedCollectionContent = (value: string) => {
-    if (!selectedCollection) return;
-    setCollectionContentByFilename((current) => ({
-      ...current,
-      [selectedCollection.filename]: value,
-    }));
-  };
 
-  const updateSelectedEnvironmentContent = (value: string) => {
-    if (!selectedEnv) return;
-    setEnvironmentContentByFilename((current) => ({
-      ...current,
-      [selectedEnv.filename]: value,
-    }));
-  };
 
-  const applySelectedCollectionEdits = () => {
-    if (!selectedCollection) return;
-    const raw = collectionContentByFilename[selectedCollection.filename];
-    if (!raw || !raw.trim()) return;
-    try {
-      const parsed = JSON.parse(raw);
-      setCollectionContentByFilename((current) => ({
-        ...current,
-        [selectedCollection.filename]: JSON.stringify(parsed, null, 2),
-      }));
-      void refreshAnalysis(selectedCollection, selectedEnv);
-      pushNotification({
-        kind: "success",
-        title: "Collection edits applied",
-        detail: "Collection JSON was validated and updated for this selected item.",
-        resolution:
-          "You can continue editing in setup or run the collection when ready.",
-      });
-    } catch (error) {
-      pushNotification({
-        kind: "error",
-        title: "Invalid collection JSON",
-        detail:
-          error instanceof Error
-            ? error.message
-            : "Collection JSON could not be parsed.",
-        resolution:
-          "Fix JSON syntax in the editor, then click Apply collection edits again.",
-      });
-    }
-  };
 
-  const applySelectedEnvironmentEdits = () => {
-    if (!selectedEnv) return;
-    const raw = environmentContentByFilename[selectedEnv.filename];
-    if (!raw || !raw.trim()) return;
-    try {
-      const parsed = JSON.parse(raw);
-      setEnvironmentContentByFilename((current) => ({
-        ...current,
-        [selectedEnv.filename]: JSON.stringify(parsed, null, 2),
-      }));
-      void refreshAnalysis(selectedCollection, selectedEnv);
-      pushNotification({
-        kind: "success",
-        title: "Environment edits applied",
-        detail:
-          "Environment JSON was validated and updated for this selected item.",
-        resolution:
-          "You can keep editing in setup or run once the variables look correct.",
-      });
-    } catch (error) {
-      pushNotification({
-        kind: "error",
-        title: "Invalid environment JSON",
-        detail:
-          error instanceof Error
-            ? error.message
-            : "Environment JSON could not be parsed.",
-        resolution:
-          "Fix JSON syntax in the editor, then click Apply environment edits again.",
-      });
-    }
-  };
 
   const resetHome = () => {
     setSelectedCollection(null);
     setResults(null);
     setExpandedId(null);
-    setActivePage("setup");
+    setActivePage("projects");
     if (isMobile) setMobileMenuOpen(false);
   };
-
-  const headerStats = results
-    ? [
-        {
-          label: "Requests",
-          value: results.stats.requests.total,
-          icon: Activity,
-          accent: "bg-sky-500/15 text-sky-300 border-sky-500/20",
-        },
-        {
-          label: "Match",
-          value: results.accuracy?.passedExecutions ?? 0,
-          icon: CheckCircle2,
-          accent: "bg-emerald-500/15 text-emerald-300 border-emerald-500/20",
-        },
-        {
-          label: "Mismatch",
-          value: results.accuracy?.failedExecutions ?? 0,
-          icon: XCircle,
-          accent: "bg-rose-500/15 text-rose-300 border-rose-500/20",
-        },
-      ]
-    : [];
 
   const selectedFlowNodeIndex =
     results && results.executions.length > 0
@@ -2667,1541 +1907,482 @@ export default function App() {
     return <AuthLanding />;
   }
 
-  if (activePage === "setup") {
-    return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.16),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(99,102,241,0.18),_transparent_28%),linear-gradient(180deg,#0f172a_0%,#08101f_100%)] text-slate-100">
-        <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col lg:flex-row">
-          {isMobile &&
-            isSidebarOpen &&
-            createPortal(
-              <div
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ zIndex: MOBILE_MENU_BACKDROP_Z }}
-                className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm lg:hidden"
-              />,
-              document.body,
-            )}
-
-          {isSidebarOpen &&
-            (() => {
-              const setupSidebar = (
-                <aside
-                  style={{ zIndex: MOBILE_MENU_PANEL_Z }}
-                  className="fixed inset-y-0 left-0 w-[88%] max-w-sm border-r border-white/10 bg-slate-950/90 px-4 py-4 shadow-[20px_0_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl lg:static lg:flex lg:w-[360px] lg:flex-col lg:px-5 lg:py-5"
-                >
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-sky-500/15 p-3 text-sky-300 ring-1 ring-inset ring-sky-500/20">
-                    <ShieldCheck className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-sky-300/80">
-                      API Tester
-                    </p>
-                    <h1 className="text-lg font-black text-white">Setup</h1>
-                    <p className="text-xs text-slate-400">
-                      Import, configure, and run
-                    </p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      isMobile
-                        ? setMobileMenuOpen(false)
-                        : setDesktopSidebarOpen(false)
-                    }
-                    className="ml-auto rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
-                    aria-label="Close sidebar"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <button
-                    onClick={() => setActivePage("setup")}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-sky-500/25 bg-sky-500/10 px-4 py-3 text-left text-sm font-semibold text-sky-200"
-                  >
-                    <FileJson className="h-4 w-4" />
-                    Setup wizard
-                  </button>
-                  <button
-                    onClick={() => setActivePage("dashboard")}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-                  >
-                    <Home className="h-4 w-4" />
-                    Dashboard
-                  </button>
-                </div>
-              </div>
-                </aside>
-              );
-              return isMobile ? createPortal(setupSidebar, document.body) : setupSidebar;
-            })()}
-
-          <main className="flex-1 px-4 py-4 lg:px-6 lg:py-6">
-            <div className="mx-auto flex max-w-6xl flex-col gap-5">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    isMobile
-                      ? setMobileMenuOpen(true)
-                      : setDesktopSidebarOpen(true)
-                  }
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:bg-white/10"
-                  aria-label="Open menu"
-                >
-                  <Menu className="h-5 w-5" />
-                </button>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Setup menu
-                </p>
-                <Show when="signed-in">
-                  <div className="ml-auto rounded-2xl border border-white/10 bg-white/5 p-1">
-                    <UserButton />
-                  </div>
-                </Show>
-              </div>
-
-              <SetupWizard
-                collections={collections}
-                environments={environments}
-                selectedCollection={selectedCollection}
-                selectedEnv={selectedEnv}
-                baseUrl={baseUrl}
-                role={selectedCredentialProfile?.role || ""}
-                username={selectedCredentialProfile?.username || ""}
-                password={selectedCredentialProfile?.password || ""}
-                analysis={analysis}
-                loading={loading}
-                onChooseCollection={(item) => {
-                  setSelectedCollection(item);
-                  setResults(null);
-                  setExpandedId(null);
-                  setActivePage("setup");
-                  void refreshAnalysis(item, selectedEnv);
-                }}
-                onSelectEnv={(item) => {
-                  setSelectedEnv(item);
-                  setActivePage("setup");
-                  void refreshAnalysis(selectedCollection, item);
-                }}
-                onBaseUrlChange={setBaseUrl}
-                onRoleChange={(value) =>
-                  updateSelectedCredentialProfile("role", value)
-                }
-                onUsernameChange={(value) =>
-                  updateSelectedCredentialProfile("username", value)
-                }
-                onPasswordChange={(value) =>
-                  updateSelectedCredentialProfile("password", value)
-                }
-                onImportCollectionFile={(file) =>
-                  importJsonFile("collection", file)
-                }
-                onImportEnvironmentFile={(file) =>
-                  importJsonFile("environment", file)
-                }
-                selectedCollectionContent={
-                  selectedCollection
-                    ? collectionContentByFilename[selectedCollection.filename] || ""
-                    : ""
-                }
-                selectedEnvironmentContent={
-                  selectedEnv
-                    ? environmentContentByFilename[selectedEnv.filename] || ""
-                    : ""
-                }
-                onCollectionContentChange={updateSelectedCollectionContent}
-                onEnvironmentContentChange={updateSelectedEnvironmentContent}
-                onApplyCollectionEdits={applySelectedCollectionEdits}
-                onApplyEnvironmentEdits={applySelectedEnvironmentEdits}
-                onRunCollection={runTest}
-                onOpenDashboard={() => setActivePage("dashboard")}
-              />
-
-              <section className="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-violet-300" />
-                  <h3 className="text-base font-black text-white">
-                    Validation schema
-                  </h3>
-                </div>
-                <p className="mt-2 text-sm leading-7 text-slate-300">
-                  Step 3 in your flow: attach a JSON schema so response
-                  structure is validated in addition to status checks.
-                </p>
-
-                <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                      Select saved schema
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={selectedSchemaId}
-                        onChange={(e) => setSelectedSchemaId(e.target.value)}
-                        className="w-full appearance-none rounded-2xl border border-white/10 bg-black/25 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
-                      >
-                        <option value="">No schema selected</option>
-                        {schemas.map((schema) => (
-                          <option key={schema.id} value={schema.id}>
-                            {schema.name}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-slate-500" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                      Schema name
-                    </label>
-                    <input
-                      value={schemaNameDraft}
-                      onChange={(e) => setSchemaNameDraft(e.target.value)}
-                      className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
-                      placeholder="Default response schema"
-                    />
-                  </div>
-                </div>
-
-                <textarea
-                  value={schemaContentDraft}
-                  onChange={(e) => setSchemaContentDraft(e.target.value)}
-                  className="mt-4 min-h-[220px] w-full rounded-[1.5rem] border border-white/10 bg-black/30 p-4 text-sm text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
-                  placeholder='{"default":{"type":"object"},"requests":{"GET::Health":{"type":"object"}}}'
-                />
-
-                <label className="mt-4 block rounded-[1.5rem] border border-dashed border-white/15 bg-black/20 p-4 text-sm text-slate-300">
-                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500">
-                    Upload schema JSON
-                  </span>
-                  <input
-                    type="file"
-                    accept="application/json,.json"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      if (file) {
-                        void importSchemaFile(file);
-                      }
-                      event.currentTarget.value = "";
-                    }}
-                    className="block w-full text-sm text-slate-300 file:mr-4 file:rounded-2xl file:border-0 file:bg-violet-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-violet-400"
-                  />
-                </label>
-
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    onClick={() => void saveSchemaDraft()}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-violet-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-violet-400"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Save schema
-                  </button>
-                  <button
-                    onClick={() => setActivePage("dashboard")}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-bold text-slate-200 transition hover:bg-white/10"
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                    Continue to run
-                  </button>
-                </div>
-              </section>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.16),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(99,102,241,0.18),_transparent_28%),linear-gradient(180deg,#0f172a_0%,#08101f_100%)] text-slate-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1800px] flex-col lg:flex-row">
-        <AnimatePresence>
-          {isMobile &&
-            isSidebarOpen &&
-            createPortal(
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ zIndex: MOBILE_MENU_BACKDROP_Z }}
-                className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm lg:hidden"
-              />,
-              document.body,
+    <div className={cn(
+      "min-h-screen transition-colors duration-500 selection:bg-indigo-500/30 relative",
+      theme === "dark" ? "bg-[#020617] text-slate-100" : "bg-slate-50 text-slate-900"
+    )}>
+      <AnimatePresence>
+        {!desktopSidebarOpen && !isMobile && (
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            onClick={() => setDesktopSidebarOpen(true)}
+            className={cn(
+              "fixed left-6 top-6 z-50 p-3 rounded-2xl border backdrop-blur-xl transition-all hover:scale-110 active:scale-95 shadow-2xl",
+              theme === "dark" ? "bg-slate-900/80 border-white/10 text-white" : "bg-white border-slate-200 text-slate-900"
             )}
-        </AnimatePresence>
+            title="Expand Sidebar"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-        <AnimatePresence>
-          {isSidebarOpen &&
-            (() => {
-              const dashboardSidebar = (
-                <motion.aside
-              initial={isMobile ? { x: -320 } : { opacity: 1, x: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={isMobile ? { x: -320 } : { opacity: 1 }}
-              transition={{ type: "spring", damping: 26, stiffness: 230 }}
-              style={{ zIndex: MOBILE_MENU_PANEL_Z }}
-              className={cn(
-                "fixed inset-y-0 left-0 w-[88%] max-w-sm border-r border-white/10 bg-slate-950/90 px-4 py-4 shadow-[20px_0_80px_rgba(0,0,0,0.4)] backdrop-blur-2xl lg:static lg:z-auto lg:flex lg:w-[360px] lg:flex-col lg:px-5 lg:py-5",
-                isMobile ? "overflow-y-auto" : "overflow-y-auto",
-              )}
-            >
-              <div className="mb-4 flex items-center justify-between rounded-3xl border border-white/10 bg-white/5 px-4 py-3 lg:hidden">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-sky-500/15 p-2 text-sky-300 ring-1 ring-inset ring-sky-500/20">
-                    <ShieldCheck className="h-5 w-5" />
+      <div className="mx-auto flex min-h-screen w-full max-w-[2000px] flex-col lg:flex-row overflow-hidden">
+        <Sidebar
+          isMobile={isMobile}
+          isSidebarOpen={isSidebarOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
+          setDesktopSidebarOpen={setDesktopSidebarOpen}
+          activePage={activePage}
+          setActivePage={setActivePage}
+          resetHome={resetHome}
+          collections={collections}
+          selectedCollection={selectedCollection}
+          selectCollection={selectCollection}
+          removeCollection={removeCollection}
+          isCollectionRemovable={isCollectionRemovable}
+          environments={environments}
+          selectedEnv={selectedEnv}
+          setSelectedEnv={setSelectedEnv}
+          baseUrl={baseUrl}
+          setBaseUrl={setBaseUrl}
+          credentialProfiles={credentialProfiles}
+          selectedCredentialProfileId={selectedCredentialProfileId}
+          setSelectedCredentialProfileId={setSelectedCredentialProfileId}
+          addCredentialProfile={addCredentialProfile}
+          removeCredentialProfile={removeCredentialProfile}
+          selectedCredentialProfile={selectedCredentialProfile}
+          updateSelectedCredentialProfile={updateSelectedCredentialProfile}
+          showActiveConfigPassword={showActiveConfigPassword}
+          setShowActiveConfigPassword={setShowActiveConfigPassword}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+
+        <main className={cn(
+          "flex-1 transition-all duration-300",
+          activePage === "projects" ? "overflow-y-auto" : "flex flex-col overflow-hidden"
+        )}>
+          {activePage === "projects" ? (
+            <ProjectGrid
+              collections={collections}
+              theme={theme}
+              toggleTheme={toggleTheme}
+              onSelect={(item) => {
+                setSelectedCollection(item);
+                setResults(null);
+                setExpandedId(null);
+                setActivePage("workspace");
+                void refreshAnalysis(item, selectedEnv);
+              }}
+              onDelete={(fn) => {
+                const item = collections.find((c) => c.filename === fn);
+                if (item) removeCollection(item);
+              }}
+              onImport={() => {
+                 const input = document.createElement('input');
+                 input.type = 'file';
+                 input.accept = '.json';
+                 input.onchange = (e: any) => {
+                   const file = e.target.files?.[0];
+                   if (file) void importJsonFile('collection', file);
+                 };
+                 input.click();
+              }}
+            />
+          ) : (
+            <div className={cn("flex flex-col h-full", theme === "dark" ? "bg-slate-950/20" : "bg-slate-50/50")}>
+              <header className={cn(
+                "px-6 py-5 flex items-center justify-between border-b backdrop-blur-3xl shadow-xl",
+                theme === "dark" ? "border-white/5 bg-slate-900/40" : "border-slate-200 bg-white"
+              )}>
+                <div className="flex items-center gap-5">
+                  <div className={cn(
+                    "p-3.5 rounded-2xl border shadow-inner group transition-all",
+                    theme === "dark" 
+                      ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20" 
+                      : "bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100"
+                  )}>
+                    <Database className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-extrabold tracking-tight text-white">
-                      API Tester
-                    </p>
-                    <p className="text-[11px] text-slate-400">Mobile menu</p>
+                    <h2 className={cn("text-2xl font-black leading-tight", theme === "dark" ? "text-white" : "text-slate-900")}>
+                      {selectedCollection?.name || "Active Workspace"}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                      <p className={cn("text-[10px] font-bold uppercase tracking-[0.3em] font-mono", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Live Session</p>
+                    </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
-                  aria-label="Close menu"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              <div className="hidden items-center justify-between rounded-[1.5rem] border border-white/10 bg-white/5 p-4 lg:flex">
-                <button
-                  onClick={resetHome}
-                  className="flex items-center gap-3 text-left"
-                >
-                  <div className="rounded-2xl bg-sky-500/15 p-3 text-sky-300 ring-1 ring-inset ring-sky-500/20">
-                    <ShieldCheck className="h-6 w-6" />
+                <div className="flex items-center gap-4">
+                  {/* View Toggle */}
+                  <div className={cn("flex items-center p-1.5 rounded-2xl border", theme === "dark" ? "bg-black/20 border-white/5" : "bg-slate-100 border-slate-200")}>
+                    <button 
+                      onClick={() => setWorkspaceView("graph")}
+                      className={cn("p-2 rounded-xl transition-all", workspaceView === "graph" ? "bg-indigo-500 text-white shadow-lg" : "text-slate-500 hover:text-slate-400")}
+                      title="Flow Graph View"
+                    >
+                      <Activity className="h-4 w-4" />
+                    </button>
+                    <button 
+                      onClick={() => setWorkspaceView("list")}
+                      className={cn("p-2 rounded-xl transition-all", workspaceView === "list" ? "bg-indigo-500 text-white shadow-lg" : "text-slate-500 hover:text-slate-400")}
+                      title="List View"
+                    >
+                      <Terminal className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-sky-300/80">
-                      API
-                    </p>
-                    <h1 className="text-lg font-black text-white">
-                      API Tester
-                    </h1>
+
+                  <div className="h-8 w-px bg-white/10 mx-1" />
+
+                  {/* Quick Actions */}
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.json';
+                        input.onchange = (e: any) => {
+                          const file = e.target.files?.[0];
+                          if (file) void importJsonFile('collection', file);
+                        };
+                        input.click();
+                      }}
+                      className={cn("p-3 rounded-2xl border transition-all", theme === "dark" ? "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900")}
+                      title="Update Collection Schema"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.json';
+                        input.onchange = (e: any) => {
+                          const file = e.target.files?.[0];
+                          if (file) void importJsonFile('environment', file);
+                        };
+                        input.click();
+                      }}
+                      className={cn("p-3 rounded-2xl border transition-all", theme === "dark" ? "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white" : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900")}
+                      title="Add Environment"
+                    >
+                      <Globe className="h-4 w-4" />
+                    </button>
+                    <button 
+                      onClick={() => selectedCollection && removeCollection(selectedCollection)}
+                      className={cn("p-3 rounded-2xl border transition-all", theme === "dark" ? "bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/20" : "bg-rose-50 border-rose-200 text-rose-500 hover:bg-rose-100")}
+                      title="Delete Collection"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
-                </button>
-                <button
-                  onClick={() => setDesktopSidebarOpen(false)}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
-                  aria-label="Close sidebar"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
 
-              <div className="mt-4 space-y-4 lg:mt-5">
-                <button
-                  onClick={() => setActivePage("setup")}
-                  className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-slate-300 transition hover:bg-white/8"
-                >
-                  <FileJson className="h-4 w-4" />
-                  <span className="text-sm font-semibold">Setup wizard</span>
-                </button>
+                  <div className="h-8 w-px bg-white/10 mx-1" />
 
-                <button
-                  onClick={resetHome}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
-                    !selectedCollection
-                      ? "border-sky-500/25 bg-sky-500/10 text-sky-200"
-                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/8",
-                  )}
-                >
-                  <Home className="h-4 w-4" />
-                  <span className="text-sm font-semibold">Home dashboard</span>
-                </button>
-
-                <section className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                  <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                    <Database className="h-3.5 w-3.5" />
-                    Collections
-                  </div>
-                  <div className="space-y-2">
-                    {collections.map((coll) => (
-                      <div
-                        key={coll.filename}
+                  {/* Validation Schema Selector */}
+                  <div className={cn(
+                    "flex flex-col items-start gap-1 px-4 py-1.5 rounded-2xl border bg-white shadow-sm transition-all duration-300 group",
+                    theme === "dark" ? "bg-slate-900 border-white/5" : "bg-white border-slate-200"
+                  )}>
+                    <p className={cn("text-[9px] font-black uppercase tracking-widest px-0.5", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Validation Schema</p>
+                    <div className="flex items-center gap-3">
+                      <select 
+                        value={selectedSchemaId} 
+                        onChange={(e) => setSelectedSchemaId(e.target.value)}
                         className={cn(
-                          "flex items-center gap-2 rounded-2xl border px-2 py-2 transition",
-                          selectedCollection?.filename === coll.filename
-                            ? "border-sky-500/25 bg-sky-500/10"
-                            : "border-white/10 bg-slate-950/20",
+                          "bg-transparent text-xs font-black outline-none appearance-none cursor-pointer pr-4",
+                          theme === "dark" ? "text-amber-400" : "text-amber-600"
                         )}
                       >
-                        <button
-                          onClick={() => selectCollection(coll)}
-                          className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-xl px-2 py-2 text-left text-slate-200"
-                        >
-                          <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                            {coll.name}
-                          </span>
-                          <ChevronRight className="h-4 w-4 shrink-0 text-slate-500" />
-                        </button>
-                        {isCollectionRemovable(coll.filename) && (
-                          <button
-                            onClick={() => void removeCollection(coll)}
-                            className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-2 text-rose-200 transition hover:bg-rose-500/20"
-                            title="Remove collection"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    {collections.length === 0 && (
-                      <p className="px-2 py-2 text-xs italic text-slate-500">
-                        No collections found.
-                      </p>
-                    )}
-                  </div>
-                </section>
-
-                <section className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                  <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                    <Settings className="h-3.5 w-3.5" />
-                    Active config
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                        Environment
-                      </label>
-                      <div className="relative">
-                        <select
-                          value={selectedEnv?.filename || ""}
-                          onChange={(e) =>
-                            setSelectedEnv(
-                              environments.find(
-                                (env) => env.filename === e.target.value,
-                              ) || null,
-                            )
-                          }
-                          className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                        >
-                          {environments.map((env) => (
-                            <option key={env.filename} value={env.filename}>
-                              {env.name}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-slate-500" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                        Base URL
-                      </label>
-                      <input
-                        value={baseUrl}
-                        onChange={(e) => setBaseUrl(e.target.value)}
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                        placeholder="http://127.0.0.1:9000"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                        Validation schema
-                      </label>
-                      <div className="relative">
-                        <select
-                          value={selectedSchemaId}
-                          onChange={(e) => setSelectedSchemaId(e.target.value)}
-                          className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:border-violet-500/40 focus:ring-2 focus:ring-violet-500/15"
-                        >
-                          <option value="">No schema selected</option>
-                          {schemas.map((schema) => (
-                            <option key={schema.id} value={schema.id}>
-                              {schema.name}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-slate-500" />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                        Credential profile
-                      </label>
-                      <div className="relative">
-                        <select
-                          value={selectedCredentialProfileId}
-                          onChange={(e) =>
-                            setSelectedCredentialProfileId(e.target.value)
-                          }
-                          className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 pr-10 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                        >
-                          {credentialProfiles.map((profile) => (
-                            <option key={profile.id} value={profile.id}>
-                              {profile.name} ({profile.role || "role"})
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="pointer-events-none absolute right-3 top-3.5 h-4 w-4 text-slate-500" />
-                      </div>
-
-                      <div className="mt-2 grid grid-cols-2 gap-2">
-                        <button
-                          onClick={addCredentialProfile}
-                          className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/20"
-                        >
-                          Add profile
-                        </button>
-                        <button
-                          onClick={() =>
-                            removeCredentialProfile(selectedCredentialProfileId)
-                          }
-                          className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20"
-                        >
-                          Remove profile
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                      <div>
-                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                          Profile label
-                        </label>
-                        <input
-                          value={selectedCredentialProfile?.name || ""}
-                          onChange={(e) =>
-                            updateSelectedCredentialProfile(
-                              "name",
-                              e.target.value,
-                            )
-                          }
-                          className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                          placeholder="Admin"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                          Role
-                        </label>
-                        <input
-                          value={selectedCredentialProfile?.role || ""}
-                          onChange={(e) =>
-                            updateSelectedCredentialProfile(
-                              "role",
-                              e.target.value,
-                            )
-                          }
-                          className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                          placeholder="admin"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                          Username
-                        </label>
-                        <input
-                          value={selectedCredentialProfile?.username || ""}
-                          onChange={(e) =>
-                            updateSelectedCredentialProfile(
-                              "username",
-                              e.target.value,
-                            )
-                          }
-                          className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                          placeholder="admin"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                          Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showActiveConfigPassword ? "text" : "password"}
-                            value={selectedCredentialProfile?.password || ""}
-                            onChange={(e) =>
-                              updateSelectedCredentialProfile(
-                                "password",
-                                e.target.value,
-                              )
+                        <option value="">No Validation</option>
+                        {schemas.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      </select>
+                      <button 
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = '.json';
+                          input.onchange = async (e: any) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                               const content = await file.text();
+                               try {
+                                  const response = await axios.post(`${API_BASE}/schemas`, { 
+                                    name: file.name.replace('.json',''), 
+                                    schemaContent: content,
+                                    parentCollectionKey: getAssetKey(selectedCollection)
+                                  }, { headers: authHeaders });
+                                  setSchemas(response.data.items || []);
+                                  setSelectedSchemaId(response.data.saved?.id || "");
+                                  pushNotification({ 
+                                    kind: 'success', 
+                                    title: 'Schema added', 
+                                    detail: 'Validation schema uploaded and selected.',
+                                    resolution: 'You can now run tests with this validation schema.'
+                                  });
+                               } catch (err) {
+                                  pushNotification({ 
+                                    kind: 'error', 
+                                    title: 'Upload failed', 
+                                    detail: 'Invalid JSON schema format.',
+                                    resolution: 'Ensure the file is a valid JSON schema object.'
+                                  });
+                               }
                             }
-                            className="w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 pr-16 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                            placeholder="Test123!"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowActiveConfigPassword((current) => !current)
-                            }
-                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-slate-300 transition hover:bg-white/10"
-                          >
-                            {showActiveConfigPassword ? "Hide" : "Show"}
-                          </button>
-                        </div>
-                      </div>
+                          };
+                          input.click();
+                        }}
+                        className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-500 transition-colors"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
                     </div>
                   </div>
-                </section>
-              </div>
-                </motion.aside>
-              );
-              return isMobile
-                ? createPortal(dashboardSidebar, document.body)
-                : dashboardSidebar;
-            })()}
-        </AnimatePresence>
 
-        <main className="flex-1 overflow-y-auto px-4 pb-10 pt-4 lg:px-6 lg:py-6">
-          <div className="mx-auto flex max-w-6xl flex-col gap-5">
-            <header className="sticky top-0 z-20 rounded-[1.75rem] border border-white/10 bg-slate-950/65 p-4 shadow-[0_20px_80px_rgba(2,6,23,0.45)] backdrop-blur-2xl lg:relative lg:top-auto">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex items-start gap-4">
-                  <button
-                    onClick={() => setMobileMenuOpen(true)}
-                    className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:bg-white/10 lg:hidden"
-                    aria-label="Open menu"
-                  >
-                    <Menu className="h-5 w-5" />
-                  </button>
+                  <div className="h-8 w-px bg-white/10 mx-1" />
 
-                  <button
-                    onClick={() => setDesktopSidebarOpen((current) => !current)}
-                    className="hidden items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-3 text-slate-200 transition hover:bg-white/10 lg:inline-flex"
-                    aria-label="Toggle sidebar"
-                  >
-                    <Menu className="h-5 w-5" />
-                  </button>
-
-                  <div className="hidden rounded-3xl border border-sky-500/20 bg-sky-500/10 p-3 text-sky-300 lg:flex">
-                    <ShieldCheck className="h-7 w-7" />
+                  <div className={cn(
+                    "hidden lg:flex flex-col items-end gap-0.5 px-5 py-2 rounded-2xl border shadow-inner",
+                    theme === "dark" ? "bg-white/[0.03] border-white/5" : "bg-slate-50 border-slate-200"
+                  )}>
+                    <p className={cn("text-[9px] font-bold uppercase tracking-widest", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Target Environment</p>
+                    <span className={cn("text-sm font-black", theme === "dark" ? "text-indigo-300" : "text-indigo-600")}>{selectedEnv?.name || 'Local/Default'}</span>
                   </div>
-
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-sky-300/80">
-                      API Tester
-                    </p>
-                    <h2 className="mt-1 truncate text-2xl font-black text-white lg:text-3xl">
-                      {selectedCollection
-                        ? selectedCollection.name
-                        : "Select a collection to inspect flows"}
-                    </h2>
-                    <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400">
-                      A responsive flow explorer that shows expected status,
-                      actual response, and endpoint verdicts clearly for both
-                      users and developers.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3 sm:flex-row lg:items-center">
-                  <Show when="signed-in">
-                    <div className="self-start rounded-2xl border border-white/10 bg-white/5 p-1">
-                      <UserButton />
-                    </div>
-                  </Show>
-                  {selectedEnv && (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                        Environment
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-white">
-                        {selectedEnv.name}
-                      </p>
-                    </div>
-                  )}
                   <button
                     onClick={runTest}
                     disabled={loading || !selectedCollection}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-4 text-sm font-bold text-white shadow-[0_14px_40px_rgba(59,130,246,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex-shrink-0 group relative inline-flex items-center gap-3 rounded-2xl bg-indigo-600 px-8 py-4 text-sm font-black text-white shadow-[0_20px_50px_rgba(79,70,229,0.3)] transition-all hover:bg-indigo-500 hover:shadow-[0_25px_60px_rgba(79,70,229,0.4)] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
                   >
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Play className="h-4 w-4" />
-                    )}
-                    {loading ? "Running" : "Run collection"}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 fill-current" />}
+                    {loading ? "Discovering Trail..." : "Run Test Trail"}
                   </button>
                 </div>
-              </div>
+              </header>
 
-              {!selectedCollection && (
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  <MetricCard
-                    label="Collections loaded"
-                    value={collections.length}
-                    icon={Database}
-                    accent="bg-slate-500/15 text-slate-200 border-slate-500/20"
-                  />
-                  <MetricCard
-                    label="Environments loaded"
-                    value={environments.length}
-                    icon={Layers}
-                    accent="bg-violet-500/15 text-violet-200 border-violet-500/20"
-                  />
-                  <MetricCard
-                    label="Ready to run"
-                    value={selectedEnv ? 1 : 0}
-                    icon={CheckCircle2}
-                    accent="bg-emerald-500/15 text-emerald-200 border-emerald-500/20"
-                  />
-                </div>
-              )}
-            </header>
-
-            {selectedCollection && results && (
-              <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {headerStats.map((item) => (
-                  <MetricCard
-                    key={item.label}
-                    label={item.label}
-                    value={item.value}
-                    icon={item.icon}
-                    accent={item.accent}
-                  />
-                ))}
-                <MetricCard
-                  label="Steps in trail"
-                  value={results.executions.length}
-                  icon={Layers}
-                  accent="bg-amber-500/15 text-amber-200 border-amber-500/20"
-                />
-              </section>
-            )}
-
-            {selectedCollection &&
-              results?.failures &&
-              results.failures.total > 0 && (
-                <section className="rounded-[1.5rem] border border-amber-500/25 bg-amber-500/10 p-4">
-                  <div className="flex items-center gap-2">
-                    <Workflow className="h-4 w-4 text-amber-200" />
-                    <h4 className="text-sm font-black text-amber-100">
-                      Run diagnostics ({results.failures.total} postman/newman
-                      failure{results.failures.total > 1 ? "s" : ""})
-                    </h4>
-                  </div>
-                  <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-2">
-                    {results.failures.items.map((failure, index) => (
-                      <div
-                        key={`${failure.source}-${index}`}
-                        className="rounded-2xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-200"
-                      >
-                        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-200">
-                          {failure.type}
-                        </p>
-                        <p className="mt-1 font-bold text-white">
-                          {failure.source}
-                        </p>
-                        {failure.parent && (
-                          <p className="text-xs text-slate-400">
-                            Step: {failure.parent}
-                          </p>
-                        )}
-                        <p className="mt-2 text-xs leading-6 text-slate-300">
-                          {failure.error}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-            {notifications.length > 0 && (
-              <section className="space-y-3">
-                {notifications.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
+              <div className="flex-1 overflow-hidden p-6 lg:p-10 flex gap-8 relative">
+                {/* Floating Action Button (FAB) for Running Tests */}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0, y: 50 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  className="fixed right-10 bottom-10 z-[100] hidden lg:block"
+                >
+                  <button
+                    onClick={runTest}
+                    disabled={loading || !selectedCollection}
                     className={cn(
-                      "rounded-[1.5rem] border p-4 shadow-[0_16px_50px_rgba(2,6,23,0.3)] backdrop-blur-xl",
-                      notificationTone(item.kind),
+                      "group flex items-center gap-3 rounded-2xl bg-indigo-600 pl-6 pr-8 py-4 text-sm font-black text-white shadow-[0_20px_50px_rgba(79,70,229,0.4)] transition-all hover:bg-indigo-500 hover:shadow-[0_25px_60px_rgba(79,70,229,0.5)] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed",
+                      loading && "pr-6"
                     )}
                   >
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                          <h4 className="text-sm font-black">{item.title}</h4>
-                          <button
-                            onClick={() => dismissNotification(item.id)}
-                            className="self-start rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 transition hover:bg-white/15"
-                          >
-                            Dismiss
-                          </button>
-                        </div>
-                        <p className="mt-2 text-sm leading-6 text-white/90">
-                          {item.detail}
-                        </p>
-                        <p className="mt-3 rounded-2xl border border-white/10 bg-slate-950/40 p-3 text-xs leading-6 text-white/90">
-                          <span className="font-black uppercase tracking-[0.24em] text-white/70">
-                            Resolution:
-                          </span>{" "}
-                          {item.resolution}
-                        </p>
-                      </div>
+                    <div className="relative flex items-center justify-center h-5 w-5">
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Play className="h-4 w-4 fill-current group-hover:scale-110 transition-transform" />
+                      )}
                     </div>
-                  </motion.div>
-                ))}
-              </section>
-            )}
+                    <span className="tracking-tight">
+                      {loading ? "Discovering Trail..." : "Run Test Trail"}
+                    </span>
+                  </button>
+                </motion.div>
 
-            {selectedCollection && results && (
-              <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-                <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                        Flow map
-                      </p>
-                      <h3 className="mt-1 text-lg font-black text-white">
-                        Editable node connections for this collection
-                      </h3>
-                      <p className="mt-1 text-sm text-slate-400">
-                        Adjust how requests connect to each other if the
-                        collection order or dependencies are wrong.
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={() => setFlowViewMode("graph")}
-                        className={cn(
-                          "inline-flex items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] transition",
-                          flowViewMode === "graph"
-                            ? "border-sky-400/40 bg-sky-500/20 text-sky-200"
-                            : "border-white/10 bg-slate-950/30 text-slate-200 hover:bg-white/10",
-                        )}
-                      >
-                        <Grid3X3 className="h-3.5 w-3.5" /> Graph
-                      </button>
-                      <button
-                        onClick={() => setFlowViewMode("list")}
-                        className={cn(
-                          "inline-flex items-center gap-2 rounded-2xl border px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] transition",
-                          flowViewMode === "list"
-                            ? "border-sky-400/40 bg-sky-500/20 text-sky-200"
-                            : "border-white/10 bg-slate-950/30 text-slate-200 hover:bg-white/10",
-                        )}
-                      >
-                        <List className="h-3.5 w-3.5" /> List
-                      </button>
-                      <button
-                        onClick={() => {
-                          const next: Record<number, number[]> = {};
-                          results.executions.forEach((_, index) => {
-                            next[index] = index === 0 ? [] : [index - 1];
-                          });
-                          setFlowConnections(next);
-                        }}
-                        className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-200 transition hover:bg-white/10"
-                      >
-                        Auto-link sequence
-                      </button>
-                    </div>
-                  </div>
-
-                  {flowViewMode === "graph" && (
-                    <div className="mt-3 rounded-2xl border border-sky-500/20 bg-sky-500/10 p-3 text-xs leading-6 text-sky-100">
-                      <span className="inline-flex items-center gap-2 font-semibold">
-                        <Link2 className="h-3.5 w-3.5" />
-                        Drag nodes to reposition. Use the right edge handle to
-                        start a curved connection and the left edge handle on
-                        another node to complete it.
-                      </span>
-                    </div>
+                <div className="flex-1 flex flex-col gap-8 overflow-hidden">
+                  {results && (
+                     <motion.div 
+                       initial={{ opacity: 0, y: -20 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
+                     >
+                        <MetricCard label="Total Steps" value={results.stats.requests.total} icon={Activity} accent="bg-indigo-500/10 text-indigo-400 ring-indigo-500/20" theme={theme} />
+                        <MetricCard label="Success Ratio" value={`${Math.round((results.accuracy?.passedExecutions / results.accuracy?.totalExecutions) * 100) || 0}%`} icon={CheckCircle2} accent="bg-emerald-500/10 text-emerald-400 ring-emerald-500/20" theme={theme} />
+                        <MetricCard label="Failures" value={results.stats.requests.failed} icon={XCircle} accent="bg-rose-500/10 text-rose-400 ring-rose-500/20" theme={theme} />
+                        <MetricCard label="Latency Avg" value={`${Math.round(results.executions.reduce((a, b) => a + (b.responseTime || 0), 0) / results.executions.length) || 0}ms`} icon={Clock} accent="bg-amber-500/10 text-amber-400 ring-amber-500/20" theme={theme} />
+                     </motion.div>
                   )}
 
-                  <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[1.55fr_0.9fr]">
-                    <div>
-                      {flowViewMode === "graph" ? (
-                        <FlowGraph
-                          executions={results.executions}
+                  <div className={cn(
+                    "flex-1 relative rounded-[3rem] border hide-scrollbar overflow-hidden transition-all duration-500",
+                    theme === "dark" 
+                      ? "border-white/5 bg-slate-950/40 shadow-2xl" 
+                      : "border-slate-200 bg-white shadow-[0_20px_80px_rgba(0,0,0,0.03)]"
+                  )}>
+                     {workspaceView === "graph" ? (
+                       <FlowGraph
+                          executions={results?.executions || analysis?.issues.map((_, i) => ({ name: `Preflight Requirement ${i+1}`, method: 'GET', passed: null, expectedStatuses: [200], status: '---' } as any)) || []}
                           flowConnections={flowConnections}
                           nodePositions={flowNodePositions}
                           selectedIndex={selectedFlowNodeIndex}
                           onSelect={(index) => setExpandedId(index)}
-                          onNodePositionChange={(index, pos) =>
-                            setFlowNodePositions((current) => ({
-                              ...current,
-                              [index]: pos,
-                            }))
-                          }
+                          onNodePositionChange={(index, pos) => setFlowNodePositions((c) => ({ ...c, [index]: pos }))}
                           linkSourceIndex={linkSourceIndex}
-                          onStartLink={(sourceIndex) =>
-                            setLinkSourceIndex((current) =>
-                              current === sourceIndex ? null : sourceIndex,
-                            )
-                          }
+                          onStartLink={setLinkSourceIndex}
                           onCompleteLink={(targetIndex) => {
-                            if (
-                              linkSourceIndex === null ||
-                              linkSourceIndex === targetIndex
-                            ) {
-                              return;
-                            }
-                            setFlowConnections((current) => {
-                              const existing = current[targetIndex] || [];
-                              if (existing.includes(linkSourceIndex)) {
-                                return current;
-                              }
-                              return {
-                                ...current,
-                                [targetIndex]: [...existing, linkSourceIndex],
-                              };
-                            });
+                            if (linkSourceIndex === null || linkSourceIndex === targetIndex) return;
+                            setFlowConnections(c => ({
+                              ...c,
+                              [targetIndex]: [...(c[targetIndex] || []), linkSourceIndex]
+                            }));
                             setLinkSourceIndex(null);
                           }}
-                        />
-                      ) : (
-                        <div className="overflow-auto rounded-[1.5rem] border border-white/10 bg-slate-950/35">
-                          <table className="w-full min-w-[560px] text-left text-sm text-slate-200">
-                            <thead className="bg-white/5 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
-                              <tr>
-                                <th className="px-3 py-3">Node</th>
-                                <th className="px-3 py-3">Method</th>
-                                <th className="px-3 py-3">Expected</th>
-                                <th className="px-3 py-3">Actual</th>
-                                <th className="px-3 py-3">Depends on</th>
-                                <th className="px-3 py-3">Verdict</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {results.executions.map((row, index) => (
-                                <tr
-                                  key={`${row.name}-${index}-list`}
-                                  className="border-t border-white/10 hover:bg-white/5"
-                                  onClick={() => setExpandedId(index)}
-                                >
-                                  <td className="px-3 py-3 font-semibold">
-                                    {index + 1}. {row.name}
-                                  </td>
-                                  <td className="px-3 py-3">{row.method}</td>
-                                  <td className="px-3 py-3">
-                                    {row.expectedStatuses.join(", ") || "None"}
-                                  </td>
-                                  <td className="px-3 py-3">{row.status}</td>
-                                  <td className="px-3 py-3">
-                                    {(flowConnections[index] || []).length === 0
-                                      ? "Start"
-                                      : (flowConnections[index] || [])
-                                          .map(
-                                            (parentIndex) =>
-                                              `${parentIndex + 1}. ${results.executions[parentIndex]?.name || "Unknown"}`,
-                                          )
-                                          .join(" | ")}
-                                  </td>
-                                  <td className="px-3 py-3">
-                                    <span
-                                      className={cn(
-                                        "rounded-full border px-2 py-1 text-[10px] font-black uppercase",
-                                        statusTone(row.passed),
-                                      )}
-                                    >
-                                      {row.passed ? "PASS" : "FAIL"}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                          theme={theme}
+                       />
+                     ) : (
+                       <StepList 
+                          executions={results?.executions || analysis?.issues.map((_, i) => ({ name: `Preflight Requirement ${i+1}`, method: 'GET', passed: null, expectedStatuses: [200], status: '---' } as any)) || []}
+                          selectedIndex={selectedFlowNodeIndex}
+                          onSelect={(index) => setExpandedId(index)}
+                          theme={theme}
+                       />
+                     )}
+                  </div>
+                </div>
+                <AnimatePresence>
+                  {selectedFlowNodeIndex !== null && (
+                    <motion.aside
+                      initial={{ opacity: 0, x: 40, scale: 0.95 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: 40, scale: 0.95 }}
+                      className={cn(
+                        "w-[440px] rounded-[3rem] border backdrop-blur-3xl p-8 overflow-y-auto custom-scrollbar z-20 transition-colors duration-500",
+                        theme === "dark" 
+                          ? "border-white/10 bg-slate-900/60 shadow-[-20px_0_80px_rgba(0,0,0,0.6)] border-l border-indigo-500/10" 
+                          : "border-slate-200 bg-white/95 shadow-[-20px_0_80px_rgba(0,0,0,0.1)] border-l border-indigo-500/5"
                       )}
-                    </div>
-
-                    <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/35 p-4">
-                      {selectedFlowNode && selectedFlowNodeIndex !== null ? (
-                        <>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                            Node inspector
-                          </p>
-                          <h4 className="mt-2 text-sm font-black text-white">
-                            {selectedFlowNodeIndex + 1}. {selectedFlowNode.name}
-                          </h4>
-                          <p className="mt-1 break-all text-xs text-slate-400">
-                            {selectedFlowNode.url}
-                          </p>
-
-                          <div className="mt-4 flex flex-wrap items-center gap-2">
-                            <span
-                              className={cn(
-                                "rounded-full border px-3 py-1 text-[10px] font-black uppercase",
-                                methodTone(selectedFlowNode.method),
-                              )}
-                            >
-                              {selectedFlowNode.method}
-                            </span>
-                            <span
-                              className={cn(
-                                "rounded-full border px-3 py-1 text-[10px] font-black uppercase",
-                                statusTone(selectedFlowNode.passed),
-                              )}
-                            >
-                              {selectedFlowNode.passed ? "PASS" : "FAIL"}
-                            </span>
-                          </div>
-
-                          <label className="mt-4 block">
-                            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">
-                              Add parent node
-                            </span>
-                            <select
-                              value=""
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                const next =
-                                  value === "" ? null : Number(value);
-                                if (next === null || Number.isNaN(next)) return;
-                                setFlowConnections((current) => ({
-                                  ...current,
-                                  [selectedFlowNodeIndex]: Array.from(
-                                    new Set([
-                                      ...(current[selectedFlowNodeIndex] || []),
-                                      next,
-                                    ]),
-                                  ),
-                                }));
-                              }}
-                              className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500/40 focus:ring-2 focus:ring-sky-500/15"
-                            >
-                              <option value="">Select parent node</option>
-                              {results.executions.map(
-                                (candidate, candidateIndex) => (
-                                  <option
-                                    key={`${candidate.name}-${candidateIndex}`}
-                                    value={candidateIndex}
-                                    disabled={
-                                      candidateIndex === selectedFlowNodeIndex
-                                    }
-                                  >
-                                    {candidateIndex + 1}. {candidate.name}
-                                  </option>
-                                ),
-                              )}
-                            </select>
-                          </label>
-
-                          <div className="mt-3 rounded-2xl border border-white/10 bg-black/25 p-3 text-xs text-slate-300">
-                            <p className="font-bold uppercase tracking-[0.22em] text-slate-500">
-                              Current parent links
-                            </p>
-                            {(flowConnections[selectedFlowNodeIndex] || [])
-                              .length === 0 ? (
-                              <p className="mt-2 text-slate-400">
-                                No parent nodes. This node can start a branch.
-                              </p>
-                            ) : (
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {(
-                                  flowConnections[selectedFlowNodeIndex] || []
-                                ).map((parentIndex) => (
-                                  <button
-                                    key={`parent-${selectedFlowNodeIndex}-${parentIndex}`}
-                                    onClick={() => {
-                                      setFlowConnections((current) => ({
-                                        ...current,
-                                        [selectedFlowNodeIndex]: (
-                                          current[selectedFlowNodeIndex] || []
-                                        ).filter(
-                                          (entry) => entry !== parentIndex,
-                                        ),
-                                      }));
-                                    }}
-                                    className="rounded-full border border-white/10 bg-slate-900/70 px-3 py-1 text-[11px] text-slate-200 transition hover:bg-rose-500/20"
-                                  >
-                                    {parentIndex + 1}.{" "}
-                                    {results.executions[parentIndex]?.name ||
-                                      "Unknown"}{" "}
-                                    ×
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-3 text-xs text-slate-300">
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold uppercase tracking-[0.22em] text-slate-500">
-                                Actual
-                              </span>
-                              <span className="font-black text-white">
-                                {selectedFlowNode.status}
-                              </span>
-                            </div>
-                            <div className="mt-2 flex items-center justify-between">
-                              <span className="font-bold uppercase tracking-[0.22em] text-slate-500">
-                                Expected
-                              </span>
-                              <span className="font-black text-white">
-                                {selectedFlowNode.expectedStatuses.length
-                                  ? selectedFlowNode.expectedStatuses.join(", ")
-                                  : "None"}
-                              </span>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <p className="text-sm text-slate-400">
-                          Select a node from the flow canvas to inspect or
-                          rewire dependencies.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                      Scalability guide
-                    </p>
-                    <h3 className="mt-1 text-lg font-black text-white">
-                      How to add new systems and collections
-                    </h3>
-                    <div className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        1. Add the new Postman collection JSON to{" "}
-                        <span className="font-bold text-white">postman/</span>{" "}
-                        or{" "}
-                        <span className="font-bold text-white">
-                          collections/
-                        </span>
-                        .
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        2. Add a matching environment JSON with the backend URL,
-                        auth token, username/password, IDs, and any custom
-                        variables.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        3. If the new system has different login keys or token
-                        names, update the sidebar config and the environment
-                        variable names used by that collection.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        4. Run the collection, then edit the node connections in
-                        the flow map if the request order or dependency wiring
-                        is different.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        5. Keep one shared base URL per system and use separate
-                        environments for local, staging, and production.
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                      Helpful errors
-                    </p>
-                    <h3 className="mt-1 text-lg font-black text-white">
-                      What error notifications mean
-                    </h3>
-                    <div className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">
-                          Missing backend URL:
-                        </span>{" "}
-                        Set the base URL in the sidebar before running a
-                        collection.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">401/403:</span>{" "}
-                        Check the login credentials, bearer token, or API key
-                        values in the environment.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">404:</span> Check
-                        the collection endpoint path, trailing slashes, and the
-                        backend route name.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">5xx:</span> Check
-                        backend logs, database connectivity, and required env
-                        vars on the backend server.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">Timeout:</span>{" "}
-                        Increase request timeout in Postman scripts, verify API
-                        latency, and inspect network stability between runner
-                        and API.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">
-                          Parse/JSON:
-                        </span>{" "}
-                        Confirm response bodies are valid JSON before parsing in
-                        tests and ensure request payloads are valid JSON.
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <span className="font-bold text-white">TLS/SSL:</span>{" "}
-                        Validate certificate chain, host name, and local CA
-                        trust settings for secure endpoints.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {!selectedCollection ? (
-              <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1.4fr_0.9fr]">
-                <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-sky-500/15 p-3 text-sky-300 ring-1 ring-inset ring-sky-500/20">
-                      <Activity className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                        Overview
-                      </p>
-                      <h3 className="text-xl font-black text-white">
-                        Choose a collection from the menu
-                      </h3>
-                    </div>
-                  </div>
-                  <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300/90">
-                    The new layout is designed to be readable on mobile and
-                    desktop. The menu stays easy to reach, and each endpoint
-                    shows expected status, actual status, request payload,
-                    response payload, and the final verdict.
-                  </p>
-
-                  <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">
-                        Mobile menu
-                      </p>
-                      <p className="mt-2 text-sm text-slate-300">
-                        Tap the hamburger icon on phones to open the drawer and
-                        switch collections/configs.
-                      </p>
-                    </div>
-                    <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">
-                        Endpoint verdicts
-                      </p>
-                      <p className="mt-2 text-sm text-slate-300">
-                        Each step displays PASS only when the actual status
-                        matches the expected one for that flow.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                    Quick start
-                  </p>
-                  <ol className="mt-4 space-y-3 text-sm leading-7 text-slate-300">
-                    <li className="rounded-2xl border border-white/10 bg-slate-950/25 p-4">
-                      1. Open the mobile menu or the left sidebar.
-                    </li>
-                    <li className="rounded-2xl border border-white/10 bg-slate-950/25 p-4">
-                      2. Pick a collection and environment.
-                    </li>
-                    <li className="rounded-2xl border border-white/10 bg-slate-950/25 p-4">
-                      3. Run the collection and inspect each endpoint row.
-                    </li>
-                  </ol>
-                </div>
-              </section>
-            ) : (
-              <section className="flex flex-col gap-5">
-                <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
-                        Selected flow
-                      </p>
-                      <h3 className="mt-2 text-xl font-black text-white">
-                        {selectedCollection.name}
-                      </h3>
-                      <p className="mt-1 text-sm text-slate-400">
-                        Endpoint details, request body, expected response, and
-                        actual response are shown for every step.
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-300">
-                        {selectedCredentialProfile?.name || "Credential"} (
-                        {selectedCredentialProfile?.role || "role"})
-                      </span>
-                      <span className="rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-300">
-                        {selectedEnv?.name || "Default environment"}
-                      </span>
-                      <span className="rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-300">
-                        {schemas.find(
-                          (schema) => schema.id === selectedSchemaId,
-                        )?.name || "No schema"}
-                      </span>
-                      <span className="rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-300">
-                        {baseUrl}
-                      </span>
-                      {results && (
-                        <>
-                          <button
-                            onClick={exportResultsAsJson}
-                            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
-                          >
-                            <Download className="h-3.5 w-3.5" /> JSON
-                          </button>
-                          <button
-                            onClick={exportResultsAsCsv}
-                            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
-                          >
-                            <Download className="h-3.5 w-3.5" /> CSV
-                          </button>
-                          <button
-                            onClick={exportResultsAsExcel}
-                            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
-                          >
-                            <Download className="h-3.5 w-3.5" /> Excel
-                          </button>
-                          <button
-                            onClick={exportResultsAsPdf}
-                            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
-                          >
-                            <Download className="h-3.5 w-3.5" /> PDF
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {loading && (
-                    <div className="rounded-[1.5rem] border border-sky-500/20 bg-sky-500/10 px-4 py-3 text-sm font-semibold text-sky-200">
-                      Running collection now. The dashboard is processing Newman
-                      results...
-                    </div>
-                  )}
-
-                  {results?.executions.map((exec, idx) => (
-                    <motion.article
-                      layout
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      key={`${exec.name}-${idx}`}
-                      className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 shadow-[0_18px_60px_rgba(2,6,23,0.35)] backdrop-blur-xl"
                     >
-                      <button
-                        onClick={() =>
-                          setExpandedId(expandedId === idx ? null : idx)
-                        }
-                        className="flex w-full flex-col gap-4 p-4 text-left transition hover:bg-white/[0.03] sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span
-                              className={cn(
-                                "rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em]",
-                                methodTone(exec.method),
-                              )}
-                            >
-                              {exec.method}
-                            </span>
-                            <span
-                              className={cn(
-                                "rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em]",
-                                statusTone(exec.passed),
-                              )}
-                            >
-                              {exec.passed ? "PASS" : "FAIL"}
-                            </span>
-                          </div>
-                          <h4 className="mt-3 truncate text-base font-bold text-white sm:text-lg">
-                            {exec.name}
-                          </h4>
-                          <p className="mt-1 break-all text-xs text-slate-400">
-                            {exec.url}
-                          </p>
+                      <div className="flex items-center justify-between mb-10">
+                        <div>
+                          <h3 className={cn("text-2xl font-black leading-none", theme === "dark" ? "text-white" : "text-slate-900")}>Intelligence</h3>
+                          <p className={cn("text-[10px] font-bold uppercase tracking-[0.4em] mt-3 font-mono", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Node Diagnostic</p>
                         </div>
-
-                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                          <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                              Actual
-                            </p>
-                            <p
-                              className={cn(
-                                "mt-1 text-sm font-black",
-                                exec.passed
-                                  ? "text-emerald-300"
-                                  : "text-rose-300",
-                              )}
-                            >
-                              {exec.status}
-                            </p>
-                          </div>
-                          <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                              Expected
-                            </p>
-                            <p className="mt-1 text-sm font-black text-slate-200">
-                              {exec.expectedStatuses.length
-                                ? exec.expectedStatuses.join(", ")
-                                : "Not specified"}
-                            </p>
-                          </div>
-                          <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-3 py-2">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                              Schema
-                            </p>
-                            <p
-                              className={cn(
-                                "mt-1 text-sm font-black",
-                                exec.schemaValidation?.configured
-                                  ? exec.schemaValidation?.passed
-                                    ? "text-emerald-300"
-                                    : "text-rose-300"
-                                  : "text-slate-300",
-                              )}
-                            >
-                              {exec.schemaValidation?.configured
-                                ? exec.schemaValidation?.passed
-                                  ? "PASS"
-                                  : "FAIL"
-                                : "Not set"}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                            <span>{exec.responseTime}ms</span>
-                            {expandedId === idx ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                          </div>
-                        </div>
-                      </button>
-
-                      <AnimatePresence>
-                        {expandedId === idx && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="border-t border-white/10 bg-slate-950/35 px-4 py-5 sm:px-6"
-                          >
-                            <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-                              <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                                  Expected result
-                                </p>
-                                <p className="mt-3 text-sm leading-7 text-slate-200">
-                                  {exec.expectedResult}
-                                </p>
-                                <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                                  <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                                    Verdict
-                                  </p>
-                                  <p
-                                    className={cn(
-                                      "mt-2 text-sm font-bold",
-                                      exec.passed
-                                        ? "text-emerald-300"
-                                        : "text-rose-300",
-                                    )}
-                                  >
-                                    {exec.passed
-                                      ? `PASS - Got ${exec.status} and it matches expected status code(s) ${exec.expectedStatuses.join(", ")}.`
-                                      : `FAIL - Got ${exec.status} but expected ${exec.expectedStatuses.join(", ")}.`}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                                  Request payload
-                                </p>
-                                <pre className="mt-3 max-h-[340px] overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-[11px] leading-6 text-slate-300">
-                                  {exec.requestBody
-                                    ? formatPayloadForDisplay(exec.requestBody)
-                                    : "// No request body"}
-                                </pre>
-                              </div>
-
-                              <div className="rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
-                                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                                  Actual response
-                                </p>
-                                <pre
-                                  className={cn(
-                                    "mt-3 max-h-[340px] overflow-auto whitespace-pre-wrap break-words rounded-2xl border p-4 text-[11px] leading-6",
-                                    exec.passed
-                                      ? "border-white/10 bg-slate-950/40 text-slate-300"
-                                      : "border-rose-500/20 bg-rose-500/10 text-rose-100",
-                                  )}
-                                >
-                                  {exec.responseBody
-                                    ? formatPayloadForDisplay(exec.responseBody)
-                                    : "// No response body"}
-                                </pre>
-                                <p className="mt-3 text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                                  Expected response sample
-                                </p>
-                                <pre className="mt-3 max-h-[220px] overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-[11px] leading-6 text-slate-300">
-                                  {exec.expectedResponseBody
-                                    ? formatPayloadForDisplay(
-                                        exec.expectedResponseBody,
-                                      )
-                                    : "// No example response in collection"}
-                                </pre>
-                              </div>
-                            </div>
-
-                            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-sky-500/10 p-4">
-                              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-sky-200/80">
-                                Expected vs actual
-                              </p>
-                              <p className="mt-2 text-sm leading-7 text-slate-200">
-                                {exec.passed
-                                  ? `Expected and actual status codes match. The flow is behaving as defined for ${exec.name}.`
-                                  : `Expected status did not match the real response. Review the response body and the collection assertion for ${exec.name}.`}
-                              </p>
-                              {exec.schemaValidation?.configured &&
-                                !exec.schemaValidation.passed && (
-                                  <p className="mt-2 text-xs leading-6 text-rose-200">
-                                    Schema mismatch:{" "}
-                                    {exec.schemaValidation.error}
-                                  </p>
-                                )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.article>
-                  ))}
-
-                  {!results && !loading && (
-                    <div className="rounded-[2rem] border border-dashed border-white/15 bg-white/5 px-6 py-16 text-center backdrop-blur-xl">
-                      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-sky-500/15 text-sky-300 ring-1 ring-inset ring-sky-500/20">
-                        <Activity className="h-7 w-7" />
+                        <button 
+                          onClick={() => setExpandedId(null)} 
+                          className="p-3.5 rounded-2xl hover:bg-white/5 text-slate-500 transition-all hover:text-white active:scale-90"
+                        >
+                          <X className="h-6 w-6" />
+                        </button>
                       </div>
-                      <h3 className="mt-5 text-xl font-black text-white">
-                        Ready to inspect flows
-                      </h3>
-                      <p className="mx-auto mt-2 max-w-lg text-sm leading-7 text-slate-400">
-                        Pick a collection, run it, and each endpoint will show
-                        the expected status, actual status, request payload,
-                        response payload, and pass/fail verdict.
-                      </p>
-                    </div>
+
+                      {selectedFlowNode && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                          <div className={cn(
+                            "p-6 rounded-[2rem] border shadow-inner relative overflow-hidden group",
+                            theme === "dark" ? "bg-white/[0.03] border-white/10" : "bg-slate-50 border-slate-200"
+                          )}>
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                              <Zap className="h-20 w-20 text-indigo-500" />
+                            </div>
+                            <p className={cn("text-[10px] font-bold uppercase tracking-widest font-mono", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Endpoint Identity</p>
+                            <h4 className={cn("mt-3 text-xl font-black break-words leading-snug", theme === "dark" ? "text-white" : "text-slate-900")}>{selectedFlowNode.name}</h4>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="p-5 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/10 transition-colors hover:bg-indigo-500/10">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-400/60 font-mono">Method</p>
+                              <p className="mt-2 text-lg font-black text-indigo-300">{selectedFlowNode.method}</p>
+                            </div>
+                            <div className={cn("p-5 rounded-[2rem] border transition-all", selectedFlowNode.passed ? "bg-emerald-500/5 border-emerald-500/10 shadow-[inner_0_0_20px_rgba(16,185,129,0.05)]" : "bg-rose-500/5 border-rose-500/10 shadow-[inner_0_0_20px_rgba(244,63,94,0.05)]")}>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 font-mono">Verdict</p>
+                              <p className={cn("mt-2 text-lg font-black", selectedFlowNode.passed ? "text-emerald-400" : "text-rose-400")}>
+                                {selectedFlowNode.passed ? "PASSED" : "FAILED"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                             <p className={cn("text-[10px] font-bold uppercase tracking-widest px-1 font-mono", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Resolved Path</p>
+                             <div className={cn(
+                               "p-5 rounded-[1.5rem] border font-mono text-[11px] break-all leading-relaxed shadow-inner group relative",
+                               theme === "dark" ? "bg-black/40 border-white/5 text-slate-400" : "bg-slate-100 border-slate-200 text-slate-600"
+                             )}>
+                                <button className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg bg-white/5 hover:bg-white/10">
+                                   <Copy className="h-3 w-3 text-slate-400" />
+                                </button>
+                                {selectedFlowNode.url}
+                             </div>
+                          </div>
+
+                          {selectedFlowNode.responseBody && (
+                            <div className="space-y-4">
+                               <p className={cn("text-[10px] font-bold uppercase tracking-widest px-1 font-mono", theme === "dark" ? "text-slate-500" : "text-slate-400")}>Deep Inspection (Payload)</p>
+                               <div className={cn(
+                                 "p-6 rounded-[2.5rem] border font-mono text-[11px] overflow-auto max-h-[360px] custom-scrollbar shadow-2xl leading-6",
+                                 theme === "dark" ? "bg-black/60 border-white/5 text-indigo-200/90 ring-1 ring-inset ring-white/5" : "bg-white border-slate-200 text-indigo-900 ring-1 ring-inset ring-slate-100"
+                               )}>
+                                  <pre>{selectedFlowNode.responseBody.includes('{') ? JSON.stringify(JSON.parse(selectedFlowNode.responseBody), null, 2) : selectedFlowNode.responseBody}</pre>
+                               </div>
+                            </div>
+                          )}
+
+                          {selectedFlowNode.assertions.length > 0 && (
+                            <div className="space-y-5">
+                               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1 font-mono">Trail Validation</p>
+                               <div className="space-y-3">
+                                  {selectedFlowNode.assertions.map((a, i) => (
+                                    <div key={i} className={cn(
+                                      "flex items-start gap-5 p-5 rounded-[1.5rem] border shadow-sm transition-all hover:translate-x-1",
+                                      theme === "dark" ? "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]" : "bg-white border-slate-100 hover:bg-slate-50"
+                                    )}>
+                                       <div className={cn("mt-1.5 h-2.5 w-2.5 rounded-full ring-4", a.passed ? "bg-emerald-500 ring-emerald-500/20" : "bg-rose-500 ring-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.4)]")} />
+                                       <div className="min-w-0 flex-1">
+                                          <p className={cn("text-sm font-black leading-tight", theme === "dark" ? "text-slate-100" : "text-slate-900")}>{a.assertion}</p>
+                                          {!a.passed && <p className="mt-2.5 text-[11px] text-rose-500/70 leading-relaxed font-semibold italic">{a.error}</p>}
+                                       </div>
+                                    </div>
+                                  ))}
+                               </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </motion.aside>
                   )}
-                </div>
-              </section>
-            )}
-          </div>
+                </AnimatePresence>
+              </div>
+            </div>
+          )}
+
         </main>
+      </div>
+
+      {/* Graceful Notification System */}
+      <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3 pointer-events-none">
+        <AnimatePresence>
+          {notifications.map((n) => (
+            <motion.div
+              key={n.id}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              className={cn(
+                "pointer-events-auto flex items-start gap-4 p-5 rounded-3xl border backdrop-blur-3xl shadow-2xl min-w-[320px] max-w-md",
+                n.kind === "success" 
+                  ? (theme === "dark" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-100" : "bg-emerald-50 border-emerald-200 text-emerald-900")
+                  : n.kind === "warning"
+                    ? (theme === "dark" ? "bg-amber-500/10 border-amber-500/20 text-amber-100" : "bg-amber-50 border-amber-200 text-amber-900")
+                    : (theme === "dark" ? "bg-rose-500/10 border-rose-500/20 text-rose-100" : "bg-rose-50 border-rose-200 text-rose-900")
+              )}
+            >
+              <div className="flex-1">
+                <p className="text-sm font-bold">{n.title}</p>
+                {n.detail && <p className="mt-1 text-xs opacity-70 leading-relaxed">{n.detail}</p>}
+              </div>
+              <button 
+                onClick={() => setNotifications(curr => curr.filter(item => item.id !== n.id))}
+                className="p-1 rounded-lg hover:bg-white/10 opacity-50 hover:opacity-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );

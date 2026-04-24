@@ -1,0 +1,687 @@
+{
+  "id": "fa5bc120-bf46-4bb9-abd8-f56a159c532d",
+  "name": "Gavo API v3 - Updated (Generated Test Environment)",
+  "values": [
+    {
+      "key": "account_status",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "actual_status",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "approval_request_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "approval_required",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "band_max",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "band_min",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "band_type",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "base_price",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "base_url",
+      "value": "https://gavo.tinka.co.ke/api/dev",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "batch_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "batch_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "batch_type",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "channel_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "checkout_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contact_email",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contact_phone",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "contacts",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "context_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "context_type",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "csv_data",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "currency",
+      "value": "KES",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "currency_code",
+      "value": "KES",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "custom_value",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_dob",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_email",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_first_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_last_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "customer_token",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "date_of_birth",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "deposit_amount",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "device_cost",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "device_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "device_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "discount_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "discount_percentage",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "discount_type",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "dispatch_reason",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "dispatch_type",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "effective_from",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "email",
+      "value": "test@example.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "enabled",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "end_date",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "execution_time",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "external_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "external_reference",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "first_deduction_date",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "first_execution",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "first_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "frequency",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "fulfillment_channel_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "fulfillment_product_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "fulfillment_service_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "hours_before",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "is_active",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "last_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "max_redemption",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "metadata",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "middle_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "min_redemption",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "mpesa_channel_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "new_password",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "new_status",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "new_username",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "notification_method",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "org_email",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "org_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "org_phone",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "organization_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "organization_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "otp_code",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "otp_delivery_method",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "otp_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "otp_purpose",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "password",
+      "value": "Test123!",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "phone_number",
+      "value": "254712345678",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "pin",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "product_code",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "product_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "product_type",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "reconcile_notes",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "recurrence",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "redemption_method_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "rejection_comment",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "rejection_reason",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "repayment_duration",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "reward_value",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "schedule_frequency",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "scheduled_at",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "scheduled_dispatch_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_code",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "service_status",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "start_date",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "stk_push_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_amount",
+      "value": "100",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_email",
+      "value": "test@example.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_first_name",
+      "value": "Test",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_last_name",
+      "value": "Account",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_middle_name",
+      "value": "User",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_phone",
+      "value": "254712345678",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_user_name",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "test_username",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "transaction_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "transaction_reason",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "update_reason",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "username",
+      "value": "admin",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "whatsapp_api_key",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "withdrawal_id",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-04-17T13:37:23Z",
+  "_postman_exported_using": "Postman/10.x"
+}
