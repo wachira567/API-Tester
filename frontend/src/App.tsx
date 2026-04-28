@@ -2202,7 +2202,7 @@ export default function App() {
                        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
                      >
                         <MetricCard label="Total Steps" value={results.stats.requests.total} icon={Activity} accent="bg-indigo-500/10 text-indigo-400 ring-indigo-500/20" theme={theme} />
-                        <MetricCard label="Success Ratio" value={`${Math.round((results.accuracy?.passedExecutions / results.accuracy?.totalExecutions) * 100) || 0}%`} icon={CheckCircle2} accent="bg-emerald-500/10 text-emerald-400 ring-emerald-500/20" theme={theme} />
+                        <MetricCard label="Success Ratio" value={`${Math.round(((results.accuracy?.passedExecutions || 0) / (results.accuracy?.totalExecutions || 1)) * 100) || 0}%`} icon={CheckCircle2} accent="bg-emerald-500/10 text-emerald-400 ring-emerald-500/20" theme={theme} />
                         <MetricCard label="Failures" value={results.stats.requests.failed} icon={XCircle} accent="bg-rose-500/10 text-rose-400 ring-rose-500/20" theme={theme} />
                         <MetricCard label="Latency Avg" value={`${Math.round(results.executions.reduce((a, b) => a + (b.responseTime || 0), 0) / results.executions.length) || 0}ms`} icon={Clock} accent="bg-amber-500/10 text-amber-400 ring-amber-500/20" theme={theme} />
                      </motion.div>

@@ -1156,7 +1156,6 @@ def run_newman(
 
 
 def create_app() -> Flask:
-    ensure_directory(IMPORT_ROOT)
     app = Flask(__name__)
     app.config["MAX_CONTENT_LENGTH"] = MAX_REQUEST_BYTES
     app.config["RATELIMIT_ENABLED"] = RATE_LIMIT_ENABLED
