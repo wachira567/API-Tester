@@ -60,7 +60,7 @@ RATE_LIMIT_CREDENTIAL_WRITE = os.getenv(
 )
 RATE_LIMIT_ANALYZE = os.getenv("API_TESTER_RATE_LIMIT_ANALYZE", "60 per minute")
 RATE_LIMIT_RUN_TEST = os.getenv("API_TESTER_RATE_LIMIT_RUN_TEST", "20 per minute")
-ALLOW_GUEST_USER = os.getenv("API_TESTER_ALLOW_GUEST_USER", "false").lower() == "true"
+ALLOW_GUEST_USER = True
 
 profile_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
 schema_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
@@ -1308,13 +1308,10 @@ def create_app() -> Flask:
         if request.method == "OPTIONS":
             return ("", 204)
 
-        external_id = str(request.headers.get("x-user-id", "")).strip()
-        if not external_id and not ALLOW_GUEST_USER:
-            return jsonify({"error": "Authentication required"}), 401
-        if not external_id:
-            external_id = "local-guest"
-        email = str(request.headers.get("x-user-email", ""))
-        display_name = str(request.headers.get("x-user-name", ""))
+        # Default to a single local user since Clerk is removed
+        external_id = "local-admin"
+        email = "admin@local.test"
+        display_name = "Local Admin"
         user_key = safe_user_key(external_id)
 
         user_context = {
@@ -1329,9 +1326,10 @@ def create_app() -> Flask:
             try:
                 db_user = ensure_db_user(external_id, email, display_name)
                 user_context["dbUserId"] = db_user.get("id") if db_user else None
-            except Exception:
-                # Fail open to local-storage mode when DB auth/user upsert is unavailable.
-                db.conn = None
+            except Exception as e:
+                print(f"Database user error: {e}")
+                # Fallback to local mode if DB is not working
+                # db.conn = None
 
         g.user_context = user_context
 
