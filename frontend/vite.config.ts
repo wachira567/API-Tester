@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 const apiProxyTarget =
-  process.env.VITE_API_PROXY_TARGET || "http://127.0.0.1:3101";
+  process.env.VITE_API_PROXY_TARGET || "http://localhost:3101";
 
 // https://vite.dev/config/
 export default defineConfig({
