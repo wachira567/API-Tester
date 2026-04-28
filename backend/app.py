@@ -28,14 +28,6 @@ except Exception:  # pragma: no cover - import handled by runtime env
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
-IMPORT_ROOT = BASE_DIR / "imports"
-COLLECTION_DIR = Path(
-    os.getenv("COLLECTION_PATH", str(BASE_DIR / "../collections"))
-).resolve()
-ENVIRONMENT_DIR = Path(
-    os.getenv("ENVIRONMENT_PATH", str(BASE_DIR / "../environments"))
-).resolve()
-POSTMAN_DIR = Path(os.getenv("POSTMAN_PATH", str(BASE_DIR / "../../postman"))).resolve()
 PORT = int(os.getenv("PORT", "3001"))
 
 DB_COLLECTION_PREFIX = "db-collections"
@@ -60,7 +52,7 @@ RATE_LIMIT_CREDENTIAL_WRITE = os.getenv(
 )
 RATE_LIMIT_ANALYZE = os.getenv("API_TESTER_RATE_LIMIT_ANALYZE", "60 per minute")
 RATE_LIMIT_RUN_TEST = os.getenv("API_TESTER_RATE_LIMIT_RUN_TEST", "20 per minute")
-ALLOW_GUEST_USER = True
+ALLOW_GUEST_USER = os.getenv("API_TESTER_ALLOW_GUEST_USER", "false").lower() == "true"
 
 profile_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
 schema_fallback_by_user: dict[str, list[dict[str, Any]]] = {}
@@ -105,15 +97,8 @@ def safe_user_key(raw: str | None) -> str:
     return safe or "local-guest"
 
 
-def get_user_import_dir(kind: str, user_key: str) -> Path:
-    folder = "environments" if kind == "environment" else "collections"
-    path = IMPORT_ROOT / folder / safe_user_key(user_key)
-    ensure_directory(path)
-    return path
 
 
-def read_json_file(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def normalize_imported_filename(name: str | None, fallback_prefix: str) -> str:
@@ -157,114 +142,6 @@ def get_db_asset_key_from_filename(kind: str, filename: str | None) -> str | Non
     return key or None
 
 
-def get_sources(kind: str, user_key: str) -> list[dict[str, Any]]:
-    imported_key = (
-        "imported-environments" if kind == "environment" else "imported-collections"
-    )
-    imported_dir = get_user_import_dir(kind, user_key)
-    return [{"key": imported_key, "dir": imported_dir}]
-
-
-def write_imported_json(
-    kind: str, filename: str | None, content: str, user_key: str
-) -> dict[str, str]:
-    target_dir = get_user_import_dir(kind, user_key)
-    normalized = normalize_imported_filename(filename, kind)
-    parsed = json.loads(content)
-    target = target_dir / normalized
-    target.write_text(json.dumps(parsed, indent=2), encoding="utf-8")
-    source = (
-        "imported-environments" if kind == "environment" else "imported-collections"
-    )
-    return {
-        "filename": f"{source}/{normalized}",
-        "name": normalized.replace(".json", "").replace("_", " ").replace("-", " "),
-    }
-
-
-def list_json_files(sources: list[dict[str, Any]]) -> list[dict[str, str]]:
-    seen: set[str] = set()
-    files: list[dict[str, str]] = []
-    for source in sources:
-        source_dir = Path(source["dir"])
-        if not source_dir.exists():
-            continue
-        for item in source_dir.iterdir():
-            if item.suffix != ".json":
-                continue
-            source_filename = f"{source['key']}/{item.name}"
-            if source_filename in seen:
-                continue
-            seen.add(source_filename)
-            files.append(
-                {
-                    "name": item.stem.replace("_", " "),
-                    "filename": source_filename,
-                }
-            )
-    return files
-
-
-def resolve_source_file(
-    input_filename: str | None, sources: list[dict[str, Any]]
-) -> Path | None:
-    if not input_filename or not isinstance(input_filename, str):
-        return None
-
-    if "/" in input_filename:
-        source_key, *rest = input_filename.split("/")
-        source = next((s for s in sources if s["key"] == source_key), None)
-        only_name = Path("/".join(rest)).name
-        if not source or not only_name.endswith(".json"):
-            return None
-
-        resolved = (Path(source["dir"]) / only_name).resolve()
-        source_root = Path(source["dir"]).resolve()
-        if source_root not in resolved.parents and resolved != source_root:
-            return None
-        return resolved if resolved.exists() else None
-
-    plain = Path(input_filename).name
-    for source in sources:
-        candidate = Path(source["dir"]) / plain
-        if candidate.exists():
-            return candidate
-    return None
-
-
-def delete_source_file(
-    input_filename: str | None, sources: list[dict[str, Any]], allowed: list[str]
-) -> dict[str, Any]:
-    if not input_filename or not isinstance(input_filename, str):
-        return {"ok": False, "status": 400, "error": "filename is required"}
-    if "/" not in input_filename:
-        return {
-            "ok": False,
-            "status": 400,
-            "error": "filename must include source key prefix",
-        }
-
-    source_key, *rest = input_filename.split("/")
-    source = next((s for s in sources if s["key"] == source_key), None)
-    if not source:
-        return {"ok": False, "status": 404, "error": "source not found"}
-    if source_key not in allowed:
-        return {
-            "ok": False,
-            "status": 403,
-            "error": f"Deletion is not allowed for {source_key}.",
-        }
-
-    only_name = Path("/".join(rest)).name
-    target = (Path(source["dir"]) / only_name).resolve()
-    source_root = Path(source["dir"]).resolve()
-    if source_root not in target.parents and target != source_root:
-        return {"ok": False, "status": 400, "error": "invalid filename path"}
-    if not target.exists():
-        return {"ok": False, "status": 404, "error": "file not found"}
-
-    target.unlink()
-    return {"ok": True}
 
 
 def normalize_base_url_for_runtime(base_url: str) -> str:
@@ -1308,10 +1185,13 @@ def create_app() -> Flask:
         if request.method == "OPTIONS":
             return ("", 204)
 
-        # Default to a single local user since Clerk is removed
-        external_id = "local-admin"
-        email = "admin@local.test"
-        display_name = "Local Admin"
+        external_id = str(request.headers.get("x-user-id", "")).strip()
+        if not external_id and not ALLOW_GUEST_USER:
+            return jsonify({"error": "Authentication required"}), 401
+        if not external_id:
+            external_id = "local-guest"
+        email = str(request.headers.get("x-user-email", ""))
+        display_name = str(request.headers.get("x-user-name", ""))
         user_key = safe_user_key(external_id)
 
         user_context = {
@@ -1326,10 +1206,9 @@ def create_app() -> Flask:
             try:
                 db_user = ensure_db_user(external_id, email, display_name)
                 user_context["dbUserId"] = db_user.get("id") if db_user else None
-            except Exception as e:
-                print(f"Database user error: {e}")
-                # Fallback to local mode if DB is not working
-                # db.conn = None
+            except Exception:
+                # Fail open to local-storage mode when DB auth/user upsert is unavailable.
+                db.conn = None
 
         g.user_context = user_context
 
@@ -1358,14 +1237,11 @@ def create_app() -> Flask:
     @app.get("/api/collections")
     def collections() -> Any:
         try:
-            files = list_json_files(
-                get_sources("collection", g.user_context["userKey"])
-            )
             db_items = [
                 map_db_asset_to_item("collection", row)
                 for row in get_db_assets(g.user_context, "collection")
             ]
-            return jsonify(db_items + files)
+            return jsonify(db_items)
         except Exception:
             return jsonify({"error": "Failed to read collections"}), 500
 
@@ -1377,15 +1253,7 @@ def create_app() -> Flask:
                 map_db_asset_to_item("environment", row)
                 for row in get_db_assets(g.user_context, "environment", parent_key)
             ]
-            
-            # Only include local files if no parent_key is specified (global view)
-            files = []
-            if not parent_key:
-                files = list_json_files(
-                    get_sources("environment", g.user_context["userKey"])
-                )
-            
-            return jsonify(db_items + files)
+            return jsonify(db_items)
         except Exception:
             return jsonify({"error": "Failed to read environments"}), 500
 
@@ -1533,20 +1401,17 @@ def create_app() -> Flask:
             return jsonify({"error": "content is required"}), 400
 
         try:
-            if db.conn and g.user_context.get("dbUserId"):
-                row = save_db_asset(g.user_context, kind, filename, content, "import", parent_collection_key)
-                imported = map_db_asset_to_item(kind, row)
-            else:
-                imported = write_imported_json(
-                    kind, filename, content, g.user_context["userKey"]
-                )
+            if not db.conn or not g.user_context.get("dbUserId"):
+                return jsonify({"error": "Database connection required for imports"}), 503
 
-            source_list = list_json_files(get_sources(kind, g.user_context["userKey"]))
+            row = save_db_asset(g.user_context, kind, filename, content, "import", parent_collection_key)
+            imported = map_db_asset_to_item(kind, row)
+
             db_items = [
                 map_db_asset_to_item(kind, row)
                 for row in get_db_assets(g.user_context, kind, parent_collection_key)
             ]
-            return jsonify({"imported": imported, "items": db_items + source_list})
+            return jsonify({"imported": imported, "items": db_items})
         except Exception as error:
             return jsonify({"error": f"Failed to import JSON: {error}"}), 400
 
@@ -1555,29 +1420,18 @@ def create_app() -> Flask:
         payload = request.get_json(silent=True) or {}
         filename = payload.get("filename")
         try:
-            if is_db_asset_filename("collection", filename):
-                result = delete_db_asset_by_filename(
-                    g.user_context, "collection", filename
-                )
-            else:
-                result = delete_source_file(
-                    filename,
-                    get_sources("collection", g.user_context["userKey"]),
-                    ["imported-collections"],
-                )
-            if not result.get("ok"):
-                return jsonify({"error": result.get("error")}), int(
-                    result.get("status", 400)
-                )
+            if not is_db_asset_filename("collection", filename):
+                 return jsonify({"error": "Only database collections can be deleted via this endpoint"}), 400
 
-            file_items = list_json_files(
-                get_sources("collection", g.user_context["userKey"])
-            )
+            result = delete_db_asset_by_filename(g.user_context, "collection", filename)
+            if not result.get("ok"):
+                return jsonify({"error": result.get("error")}), int(result.get("status", 400))
+
             db_items = [
                 map_db_asset_to_item("collection", row)
                 for row in get_db_assets(g.user_context, "collection")
             ]
-            return jsonify({"items": db_items + file_items})
+            return jsonify({"items": db_items})
         except Exception as error:
             return jsonify({"error": f"Failed to remove collection: {error}"}), 500
 
@@ -1586,29 +1440,18 @@ def create_app() -> Flask:
         payload = request.get_json(silent=True) or {}
         filename = payload.get("filename")
         try:
-            if is_db_asset_filename("environment", filename):
-                result = delete_db_asset_by_filename(
-                    g.user_context, "environment", filename
-                )
-            else:
-                result = delete_source_file(
-                    filename,
-                    get_sources("environment", g.user_context["userKey"]),
-                    ["imported-environments"],
-                )
-            if not result.get("ok"):
-                return jsonify({"error": result.get("error")}), int(
-                    result.get("status", 400)
-                )
+            if not is_db_asset_filename("environment", filename):
+                 return jsonify({"error": "Only database environments can be deleted via this endpoint"}), 400
 
-            file_items = list_json_files(
-                get_sources("environment", g.user_context["userKey"])
-            )
+            result = delete_db_asset_by_filename(g.user_context, "environment", filename)
+            if not result.get("ok"):
+                return jsonify({"error": result.get("error")}), int(result.get("status", 400))
+
             db_items = [
                 map_db_asset_to_item("environment", row)
                 for row in get_db_assets(g.user_context, "environment")
             ]
-            return jsonify({"items": db_items + file_items})
+            return jsonify({"items": db_items})
         except Exception as error:
             return jsonify({"error": f"Failed to remove environment: {error}"}), 500
 
@@ -1625,21 +1468,11 @@ def create_app() -> Flask:
         if not filename:
             return jsonify({"error": "filename is required"}), 400
 
-        collection_sources = get_sources("collection", g.user_context["userKey"])
-        environment_sources = get_sources("environment", g.user_context["userKey"])
-
-        collection_path = resolve_source_file(filename, collection_sources)
-        environment_path = (
-            resolve_source_file(environment_filename, environment_sources)
-            if environment_filename
-            else None
-        )
-
         try:
-            db_collection = get_db_asset_content_by_filename(
+            collection = get_db_asset_content_by_filename(
                 g.user_context, "collection", filename
             )
-            db_environment = (
+            environment = (
                 get_db_asset_content_by_filename(
                     g.user_context, "environment", environment_filename
                 )
@@ -1647,15 +1480,8 @@ def create_app() -> Flask:
                 else None
             )
 
-            collection = db_collection or (
-                read_json_file(collection_path) if collection_path else None
-            )
-            environment = db_environment or (
-                read_json_file(environment_path) if environment_path else None
-            )
-
             if not collection:
-                return jsonify({"error": "Collection not found"}), 404
+                return jsonify({"error": "Collection not found in database"}), 404
 
             variable_overrides = parse_variable_overrides(source.get("variableOverrides"))
             schema_doc = resolve_schema_selection(
@@ -1683,53 +1509,19 @@ def create_app() -> Flask:
         if not filename and not collection_content:
             return jsonify({"error": "filename or collectionContent is required"}), 400
 
-        collection_sources = get_sources("collection", g.user_context["userKey"])
-        environment_sources = get_sources("environment", g.user_context["userKey"])
-
-        collection_path = (
-            None
-            if collection_content
-            else resolve_source_file(filename, collection_sources)
-        )
-        environment_path = (
-            None
-            if environment_content
-            else resolve_source_file(environment_filename, environment_sources)
-            if environment_filename
-            else None
-        )
-
         try:
-            db_collection = (
-                get_db_asset_content_by_filename(g.user_context, "collection", filename)
-                if (not collection_content and filename)
-                else None
-            )
-            db_environment = (
-                get_db_asset_content_by_filename(
-                    g.user_context, "environment", environment_filename
-                )
-                if (not environment_content and environment_filename)
-                else None
-            )
-
-            collection = (
-                json.loads(collection_content)
-                if collection_content
-                else (
-                    db_collection
-                    or (read_json_file(collection_path) if collection_path else None)
-                )
-            )
+            if collection_content:
+                collection = json.loads(collection_content)
+            else:
+                collection = get_db_asset_content_by_filename(g.user_context, "collection", filename)
+            
             if not collection:
                 return jsonify({"error": "Collection not found"}), 404
 
             if environment_content:
                 environment = json.loads(environment_content)
-            elif db_environment:
-                environment = db_environment
-            elif environment_path:
-                environment = read_json_file(environment_path)
+            elif environment_filename:
+                environment = get_db_asset_content_by_filename(g.user_context, "environment", environment_filename)
             else:
                 environment = None
 

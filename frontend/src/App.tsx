@@ -21,6 +21,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import {
+  AuthenticateWithRedirectCallback,
+  useClerk,
+  useSignIn,
+  useSignUp,
+  useUser,
+} from "@clerk/react";
 import Sidebar from "./components/Sidebar";
 import { ProjectGrid } from "./components/ProjectGrid";
 
@@ -29,7 +36,435 @@ function cn(...inputs: ClassValue[]) {
 }
 
 
+function clerkErrorMessage(error: unknown, fallback: string) {
+  if (
+    typeof error === "object" &&
+    error &&
+    "longMessage" in error &&
+    typeof (error as { longMessage?: unknown }).longMessage === "string"
+  ) {
+    return (error as { longMessage: string }).longMessage;
+  }
 
+  if (typeof error === "object" && error && "errors" in error) {
+    const maybeErrors = (error as { errors?: Array<{ message?: string }> })
+      .errors;
+    if (Array.isArray(maybeErrors) && maybeErrors.length > 0) {
+      const first = maybeErrors.find((entry) => entry?.message)?.message;
+      if (first) return first;
+    }
+  }
+
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
+
+function AuthLanding() {
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+
+  const { isLoaded: userLoaded } = useUser();
+  const clerk = useClerk();
+  const { signIn, fetchStatus: signInFetchStatus } = useSignIn();
+  const { signUp, fetchStatus: signUpFetchStatus } = useSignUp();
+  const clerkBusy =
+    !userLoaded ||
+    signInFetchStatus === "fetching" ||
+    signUpFetchStatus === "fetching";
+
+  const finalizePendingSession = async () => {
+    if (signIn.status === "complete") {
+      const finalizeResult = await signIn.finalize();
+      if (finalizeResult.error) {
+        setAuthError(
+          clerkErrorMessage(
+            finalizeResult.error,
+            "Could not finalize sign in.",
+          ),
+        );
+        return false;
+      }
+      return true;
+    }
+
+    if (signUp.status === "complete") {
+      const finalizeResult = await signUp.finalize();
+      if (finalizeResult.error) {
+        setAuthError(
+          clerkErrorMessage(
+            finalizeResult.error,
+            "Could not finalize sign up.",
+          ),
+        );
+        return false;
+      }
+      return true;
+    }
+
+    return false;
+  };
+
+  useEffect(() => {
+    if (!userLoaded) return;
+    void finalizePendingSession();
+  }, [userLoaded, signIn.status, signUp.status]);
+
+  const resetFlow = () => {
+    setAuthError(null);
+    setAuthMessage(null);
+    setNeedsVerification(false);
+    setVerificationCode("");
+  };
+
+  const submitSignIn = async () => {
+    setIsSubmitting(true);
+    setAuthError(null);
+    setAuthMessage(null);
+
+    try {
+      const signInResult = await signIn.password({ identifier, password });
+
+      if (signInResult.error) {
+        setAuthError(
+          clerkErrorMessage(
+            signInResult.error,
+            "Sign in failed. Check your credentials.",
+          ),
+        );
+        return;
+      }
+
+      if (await finalizePendingSession()) {
+        return;
+      }
+
+      setAuthError(
+        "Sign in requires an additional factor. Enable another strategy in Clerk settings or complete MFA.",
+      );
+    } catch (error) {
+      setAuthError(
+        clerkErrorMessage(error, "Sign in failed. Check your credentials."),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const submitSignUp = async () => {
+    if (password !== confirmPassword) {
+      setAuthError("Passwords do not match.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthError(null);
+    setAuthMessage(null);
+
+    try {
+      const createResult = await signUp.create({
+        emailAddress: identifier,
+      });
+      if (createResult.error) {
+        setAuthError(
+          clerkErrorMessage(
+            createResult.error,
+            "Sign up failed. Please try again.",
+          ),
+        );
+        return;
+      }
+
+      const passwordResult = await signUp.password({
+        emailAddress: identifier,
+        password,
+      });
+      if (passwordResult.error) {
+        setAuthError(
+          clerkErrorMessage(
+            passwordResult.error,
+            "Could not set your password. Please retry.",
+          ),
+        );
+        return;
+      }
+
+      const sendCodeResult = await signUp.verifications.sendEmailCode();
+      if (sendCodeResult.error) {
+        setAuthError(
+          clerkErrorMessage(
+            sendCodeResult.error,
+            "Could not send verification code.",
+          ),
+        );
+        return;
+      }
+
+      setNeedsVerification(true);
+      setAuthMessage(
+        "A verification code was sent to your email. Enter it to activate your account.",
+      );
+    } catch (error) {
+      setAuthError(
+        clerkErrorMessage(error, "Sign up failed. Please try again."),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const submitVerification = async () => {
+    setIsSubmitting(true);
+    setAuthError(null);
+
+    try {
+      const verifyResult = await signUp.verifications.verifyEmailCode({
+        code: verificationCode,
+      });
+      if (verifyResult.error) {
+        setAuthError(
+          clerkErrorMessage(verifyResult.error, "Invalid verification code."),
+        );
+        return;
+      }
+
+      if (await finalizePendingSession()) {
+        return;
+      }
+
+      setAuthError("Verification is incomplete. Please check your code.");
+    } catch (error) {
+      setAuthError(
+        clerkErrorMessage(error, "Invalid verification code. Please retry."),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const startOAuth = async (strategy: "oauth_google" | "oauth_github") => {
+    setIsSubmitting(true);
+    setAuthError(null);
+    setAuthMessage(null);
+    const origin = window.location.origin;
+
+    try {
+      await clerk.client?.signIn.authenticateWithRedirect({
+        strategy,
+        redirectUrl: `${origin}/sso-callback`,
+        redirectUrlComplete: origin,
+      });
+    } catch (error) {
+      setAuthError(clerkErrorMessage(error, "Could not start social sign in."));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const canSubmit = identifier.trim().length > 0 && password.trim().length >= 8;
+
+  return (
+    <div className="flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_15%_10%,rgba(14,165,233,0.2),transparent_30%),radial-gradient(circle_at_80%_0%,rgba(34,197,94,0.14),transparent_32%),linear-gradient(165deg,#040711_0%,#071330_58%,#020617_100%)] px-4 py-10 text-slate-100">
+      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.04)_1px,transparent_1px)] bg-[size:32px_32px]" />
+      <div className="relative w-full max-w-5xl overflow-hidden rounded-[2.4rem] border border-indigo-200/10 bg-slate-950/55 backdrop-blur-2xl">
+        <div className="grid md:grid-cols-[1.15fr_1fr]">
+          <section className="relative border-b border-white/10 p-8 md:border-b-0 md:border-r md:p-10">
+            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-300/30 bg-indigo-400/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-indigo-200">
+              Nexus API Explorer
+            </span>
+            <h1 className="mt-6 text-4xl font-black leading-tight text-white md:text-5xl">
+              Validate APIs with confidence.
+            </h1>
+            <p className="mt-5 max-w-lg text-sm leading-7 text-slate-300 md:text-base">
+              Personal workspaces for collections, environments, schemas, and
+              run history. Sign in to continue with your isolated testing data.
+            </p>
+            <div className="mt-10 grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                Per-user isolated assets
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                Schema-aware run diagnostics
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                Credential profiles
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                Run history and failure insights
+              </div>
+            </div>
+          </section>
+
+          <section className="p-8 md:p-10">
+            <div className="mb-6 inline-flex rounded-2xl border border-white/10 bg-white/5 p-1">
+              <button
+                onClick={() => {
+                  setMode("signin");
+                  resetFlow();
+                }}
+                className={cn(
+                  "rounded-xl px-4 py-2 text-sm font-semibold transition",
+                  mode === "signin"
+                    ? "bg-indigo-400 text-slate-950"
+                    : "text-slate-300 hover:text-white",
+                )}
+              >
+                Sign in
+              </button>
+              <button
+                onClick={() => {
+                  setMode("signup");
+                  resetFlow();
+                }}
+                className={cn(
+                  "rounded-xl px-4 py-2 text-sm font-semibold transition",
+                  mode === "signup"
+                    ? "bg-emerald-300 text-slate-950"
+                    : "text-slate-300 hover:text-white",
+                )}
+              >
+                Create account
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {clerkBusy && (
+                <div className="rounded-2xl border border-indigo-300/30 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-100">
+                  Preparing secure authentication...
+                </div>
+              )}
+
+              <label className="block text-sm text-slate-300">
+                Email address
+                <input
+                  type="email"
+                  value={identifier}
+                  onChange={(event) => setIdentifier(event.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-indigo-400/50"
+                  placeholder="you@example.com"
+                />
+              </label>
+
+              <label className="block text-sm text-slate-300">
+                Password
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-indigo-400/50"
+                  placeholder="At least 8 characters"
+                />
+              </label>
+
+              {mode === "signup" && !needsVerification && (
+                <label className="block text-sm text-slate-300">
+                  Confirm password
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
+                    className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
+                    placeholder="Repeat password"
+                  />
+                </label>
+              )}
+
+              {mode === "signup" && needsVerification && (
+                <label className="block text-sm text-slate-300">
+                  Verification code
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(event) =>
+                      setVerificationCode(event.target.value)
+                    }
+                    className="mt-2 w-full rounded-2xl border border-white/15 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
+                    placeholder="Enter email code"
+                  />
+                </label>
+              )}
+
+              {authError && (
+                <div className="rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
+                  {authError}
+                </div>
+              )}
+
+              {authMessage && (
+                <div className="rounded-2xl border border-emerald-200/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                  {authMessage}
+                </div>
+              )}
+
+              <button
+                onClick={() => {
+                  if (mode === "signin") {
+                    void submitSignIn();
+                    return;
+                  }
+                  if (needsVerification) {
+                    void submitVerification();
+                    return;
+                  }
+                  void submitSignUp();
+                }}
+                disabled={
+                  isSubmitting ||
+                  !canSubmit ||
+                  (mode === "signup" && needsVerification && !verificationCode)
+                }
+                className={cn(
+                  "mt-2 w-full rounded-2xl px-5 py-3 text-sm font-bold text-slate-950 transition",
+                  mode === "signin"
+                    ? "bg-indigo-300 hover:bg-indigo-200"
+                    : "bg-emerald-300 hover:bg-emerald-200",
+                  "disabled:cursor-not-allowed disabled:opacity-60",
+                )}
+              >
+                {isSubmitting
+                  ? "Working..."
+                  : mode === "signin"
+                    ? "Sign in"
+                    : needsVerification
+                      ? "Verify and continue"
+                      : "Create account"}
+              </button>
+
+              <div className="relative py-1">
+                <div className="h-px bg-white/10" />
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-slate-950 px-3 py-0.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                  or continue with
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <button
+                  onClick={() => void startOAuth("oauth_google")}
+                  disabled={isSubmitting}
+                  className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Continue with Google
+                </button>
+                <button
+                  onClick={() => void startOAuth("oauth_github")}
+                  disabled={isSubmitting}
+                  className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Continue with GitHub
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface Item {
   name: string;
@@ -674,6 +1109,8 @@ export default function App() {
   const [schemas, setSchemas] = useState<SchemaItem[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const { isLoaded, user } = useUser();
+  const oauthCallbackPath = "/sso-callback";
   const [collections, setCollections] = useState<Item[]>([]);
   const [environments, setEnvironments] = useState<Item[]>([]);
   const [selectedSchemaId, setSelectedSchemaId] = useState<string>("");
@@ -726,9 +1163,9 @@ export default function App() {
     ) || credentialProfiles[0];
 
   const authHeaders = {
-    "x-user-id": "local-guest",
-    "x-user-email": "guest@local.test",
-    "x-user-name": "Guest User",
+    "x-user-id": user?.id || "local-guest",
+    "x-user-email": user?.primaryEmailAddress?.emailAddress || "",
+    "x-user-name": user?.fullName || user?.username || "",
   };
 
   const isMobile = windowWidth < 1024;
@@ -757,6 +1194,8 @@ export default function App() {
   }, [isMobile]);
 
   useEffect(() => {
+    if (!isLoaded || !user) return;
+
     const fetchData = async () => {
       try {
         const collRes = await axios.get(`${API_BASE}/collections`, { headers: authHeaders });
@@ -767,7 +1206,7 @@ export default function App() {
     };
 
     fetchData();
-  }, []);
+  }, [isLoaded, user]);
 
   useEffect(() => {
     if (collections.length > 0 && !selectedCollection) {
@@ -777,6 +1216,7 @@ export default function App() {
 
   // Handle workspace isolation: Refresh envs/schemas when collection changes
   useEffect(() => {
+    if (!isLoaded || !user) return;
     
     // Only fetch scoped assets if we have a selected collection
     // Otherwise, and specifically for environments, we might want a global list 
@@ -841,7 +1281,7 @@ export default function App() {
     };
 
     fetchScopedAssets();
-  }, [selectedCollection]);
+  }, [selectedCollection, user, isLoaded]);
 
   useEffect(() => {
     if (!selectedCollection) {
@@ -914,6 +1354,7 @@ export default function App() {
     selectedEnv,
     baseUrl,
     selectedSchemaId,
+    user,
     selectedCredentialProfile,
     collectionContentByFilename,
     environmentContentByFilename,
@@ -953,7 +1394,7 @@ export default function App() {
       connections: Record<number, number[]>,
       positions: Record<number, { x: number; y: number }>,
     ) => {
-      if (!selectedCollection) return;
+      if (!selectedCollection || !isLoaded || !user) return;
 
       try {
         const rawContent = collectionContentByFilename[selectedCollection.filename];
@@ -985,7 +1426,7 @@ export default function App() {
         console.error("Failed to save workspace state", e);
       }
     },
-    [selectedCollection, collectionContentByFilename],
+    [selectedCollection, isLoaded, user, collectionContentByFilename],
   );
 
   useEffect(() => {
@@ -1443,6 +1884,28 @@ export default function App() {
       ? results.executions[selectedFlowNodeIndex]
       : null;
 
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-200">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (window.location.pathname === oauthCallbackPath) {
+    return (
+      <AuthenticateWithRedirectCallback
+        signInFallbackRedirectUrl="/"
+        signUpFallbackRedirectUrl="/"
+        signInForceRedirectUrl="/"
+        signUpForceRedirectUrl="/"
+      />
+    );
+  }
+
+  if (!user) {
+    return <AuthLanding />;
+  }
 
 
   return (
