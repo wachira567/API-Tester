@@ -1773,7 +1773,8 @@ if HAS_DATABASE:
     try:
         db.connect()
         initialize_database()
-    except Exception:
+    except Exception as e:
+        print(f"Database connection failed: {e}")
         db.conn = None
 
 
