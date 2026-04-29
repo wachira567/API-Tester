@@ -1,0 +1,108 @@
+{
+    "info": {
+        "name": "Gavo V3 API",
+        "description": "API documentation for Gavo V3 with RBAC roles and validation constraints.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "01 - Health & Discovery",
+            "item": [
+                {
+                    "name": "Heartbeat",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/health",
+                        "description": "Allowed Roles: system_admin",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    }
+                },
+                {
+                    "name": "Statuses",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/statuses",
+                        "description": "Allowed Roles: system_admin, organization_user, organization_ro_api, organization_admin, checker, maker, system_user, system_ro_api, system_rw_api",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    }
+                },
+                {
+                    "name": "List Public Services",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/public/services",
+                        "description": "Allowed Roles: system_admin",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "02 - Auth & Identity",
+            "item": [
+                {
+                    "name": "User Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": "{{baseUrl}}/users/register",
+                        "description": "Allowed Roles: system_admin, organization_admin",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"{{name}}\", \n    \"password\": \"{{password}}\", \n    \"username\": \"{{username}}\", \n    \"email\": \"{{email}}\", \n    \"organization_id\": \"{{organization_id}}\", \n    \"roles\": \"{{roles}}\" \n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "User Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": "{{baseUrl}}/users/login",
+                        "description": "Allowed Roles: system_admin",
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{username}}\", \n    \"password\": \"{{password}}\" \n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.token) {",
+                                    "    pm.environment.set(\"apiToken\", jsonData.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

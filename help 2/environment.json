@@ -1,0 +1,23 @@
+{
+  "id": "gavo-v3-api-env",
+  "name": "Gavo V3 API Environment",
+  "values": [
+    { "key": "baseUrl", "value": "https://api.gavo.v3.example.com", "enabled": true },
+    { "key": "apiToken", "value": "", "enabled": true },
+    { "key": "username", "value": "admin_user", "enabled": true },
+    { "key": "password", "value": "SecurePass123!", "enabled": true },
+    { "key": "email", "value": "admin@example.com", "enabled": true },
+    { "key": "organization_id", "value": "550e8400-e29b-41d4-a716-446655440000", "enabled": true },
+    { "key": "org_id", "value": "550e8400-e29b-41d4-a716-446655440000", "enabled": true },
+    { "key": "user_id", "value": "123e4567-e89b-12d3-a456-426614174000", "enabled": true },
+    { "key": "service_id", "value": "7c9e6679-7425-40de-944b-e07fc1f90ae7", "enabled": true },
+    { "key": "product_id", "value": "d290f1ee-6c54-4b01-90e6-d701748f0851", "enabled": true },
+    { "key": "customer_id", "value": "f47ac10b-58cc-4372-a567-0e02b2c3d479", "enabled": true },
+    { "key": "phone_number", "value": "254700000000", "enabled": true },
+    { "key": "otp_code", "value": "123456", "enabled": true },
+    { "key": "amount", "value": "1000", "enabled": true },
+    { "key": "currency_code", "value": "KES", "enabled": true },
+    { "key": "roles", "value": ["system_admin"], "enabled": true }
+  ],
+  "_postman_variable_scope": "environment"
+}
